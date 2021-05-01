@@ -1,0 +1,92 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.Fiot" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/blue</item>
+        <item name="colorPrimaryVariant">@color/blue_dark</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/blue2</item>
+        <item name="colorSecondaryVariant">@color/blue2_dark</item>
+        <item name="colorOnSecondary">@color/black</item>
+
+        <item name="colorAccent">@color/purple_dark</item>
+        <item name="colorError">@color/pink_dark</item>
+
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
+        <!-- Customize your theme here. -->
+        <item name="backgroundColor">@color/background</item>
+        <item name="colorOnSurface">@color/foreground</item>
+
+        <item name="itemTextColor">@color/black</item>
+
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+
+        <item name="android:windowActivityTransitions">true</item>
+        <item name="android:windowEnterTransition">@transition/transition_in</item>
+        <item name="android:windowExitTransition">@transition/transition_out</item>
+        <item name="android:windowSharedElementEnterTransition">
+            @transition/image_transform_in</item>
+        <item name="android:windowSharedElementExitTransition">
+            @transition/image_transform_out</item>
+
+    </style>
+
+    <style name="layout_theme" parent="Theme.AppCompat.Light">
+        <item name="colorAccent">@color/pink</item>
+        <item name="colorPrimary">@color/blue2_dark</item>
+        <item name="colorPrimaryDark">@color/blue_dark</item>
+        <item name="colorControlNormal">@color/gray</item>
+        <item name="colorControlActivated">@color/blue2_dark</item>
+    </style>
+
+    <style name="text_subtitle" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="text_main_title" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="text_title" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="text_bold">
+        <item name="android:textColor">?attr/subtitleTextColor</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="text_emphasis">
+        <item name="android:textColor">?attr/titleTextColor</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textScaleX">1</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="text_small">
+        <item name="android:textColor">?attr/titleTextColor</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textScaleX">1</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="text_max">
+        <item name="android:textColor">?attr/titleTextColor</item>
+        <item name="android:textSize">64sp</item>
+        <item name="android:textScaleX">1.1</item>
+        <item name="android:typeface">monospace</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif-condensed</item>
+    </style>
+
+
+
+
+</resources>

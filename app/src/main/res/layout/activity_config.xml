@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ConfigActivity">
+
+    <data>
+        <variable
+            name="device_name"
+            type="String" />
+        <variable
+            name="create_time"
+            type="String" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/backgroundColor">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/config_toolbar"
+            android:fitsSystemWindows="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorOnSurface"
+            app:titleTextAppearance="@style/text_title"
+            app:subtitleTextAppearance="@style/text_subtitle"
+            app:title="@{device_name}"
+            app:subtitle="@{create_time}"
+            app:navigationIcon="@drawable/ic_back"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/config_service"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:background="@drawable/round_white"
+            android:layout_marginTop="22dp"
+            android:paddingVertical="12dp"
+            android:layoutAnimation="@anim/layout_animation_slide_left"
+            tools:listitem="@layout/item_service"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintTop_toBottomOf="@+id/config_toolbar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/config_arrow"/>
+
+        <ImageView
+            android:id="@+id/config_arrow"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            app:layout_constraintEnd_toStartOf="@+id/config_service"
+            app:layout_constraintStart_toEndOf="@+id/config_characteristic"
+            app:layout_constraintTop_toTopOf="@+id/config_service"
+            app:layout_constraintBottom_toBottomOf="@+id/config_service"
+            android:src="@drawable/ic_back"
+            android:contentDescription="@string/to" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/config_characteristic"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/round_white"
+            android:paddingVertical="12dp"
+            tools:listitem="@layout/item_characteristic"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintTop_toTopOf="@+id/config_service"
+            app:layout_constraintBottom_toBottomOf="@+id/config_service"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/config_arrow"/>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

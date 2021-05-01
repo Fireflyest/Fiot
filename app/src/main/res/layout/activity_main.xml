@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/main_pages"
+            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/main_bottom"
+            android:overScrollMode="never"/>
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/main_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true"
+            app:elevation="3dp"
+            app:itemBackground="@android:color/transparent"
+            app:itemIconTint="@color/color_bottom_navigation"
+            app:itemTextColor="@color/color_bottom_navigation"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:menu="@menu/menu_bottom">
+
+            <ImageView
+                android:id="@+id/main_float"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:transitionName="scan"
+                android:scaleType="fitCenter"
+                android:background="@drawable/background_float"
+                android:layout_gravity="center"
+                android:contentDescription="@string/add"
+                android:src="@drawable/ic_add"/>
+
+        </com.google.android.material.bottomnavigation.BottomNavigationView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

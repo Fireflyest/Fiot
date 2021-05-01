@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="device"
+            type="com.fireflyest.fiot.bean.Device" />
+        <variable
+            name="dot"
+            type="android.graphics.drawable.Drawable" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/item_device"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_marginHorizontal="4dp"
+        android:layout_marginVertical="4dp"
+        android:background="@drawable/round_white">
+
+        <ImageView
+            android:id="@+id/device_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/device_name"
+            app:layout_constraintBottom_toBottomOf="@+id/device_name"
+            android:src="@{dot}"
+            android:contentDescription="@string/state" />
+
+        <TextView
+            android:id="@+id/device_name"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/device_state"
+            android:maxLines="1"
+            android:layout_marginVertical="8dp"
+            android:layout_marginStart="2dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:transitionName="device_name"
+            android:textColor="?attr/itemTextColor"
+            android:theme="@style/text_bold"
+            android:text="@={device.nickname}" />
+
+        <TextView
+            android:id="@+id/device_address"
+            app:layout_constraintTop_toBottomOf="@+id/device_name"
+            app:layout_constraintStart_toStartOf="@+id/device_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:theme="@style/text_small"
+            android:text="@={device.address}"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
