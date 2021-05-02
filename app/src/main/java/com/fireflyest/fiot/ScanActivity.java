@@ -38,6 +38,8 @@ import java.util.List;
 
 public class ScanActivity extends AppCompatActivity {
 
+    public static final String TAG = ScanActivity.class.getSimpleName();
+
     private ActivityScanBinding binding;
     private ScanViewModel model;
 
@@ -45,8 +47,6 @@ public class ScanActivity extends AppCompatActivity {
 
     private ScanedItemAdapter scanedItemAdapter;
     private BluetoothAdapter bluetoothAdapter;
-
-    public static final String TAG = "ScanActivity";
 
     public static final int ENABLE_BLUETOOTH = 0;
 
@@ -89,9 +89,7 @@ public class ScanActivity extends AppCompatActivity {
         model.getScanedData().observe(this, scaned -> scanedItemAdapter.addItem(scaned));
 
         model.getDiscoveryData().observe(this, discovery -> binding.setDiscovery(discovery));
-        model.getAmountData().observe(this, amount->{
-            binding.scanAmount.setText(amount.toString());
-        });
+        model.getAmountData().observe(this, amount-> binding.scanAmount.setText(amount.toString()));
         binding.scanAmount.setFactory(() -> {
             TextView textView = new TextView(this);
             textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 72);

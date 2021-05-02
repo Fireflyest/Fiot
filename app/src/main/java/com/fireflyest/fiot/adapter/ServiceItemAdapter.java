@@ -4,63 +4,64 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+import android.widget.BaseAdapter;
 
 import com.fireflyest.fiot.bean.Service;
 import com.fireflyest.fiot.databinding.ItemServiceBinding;
 
 import java.util.List;
 
-public class ServiceItemAdapter extends RecyclerView.Adapter<ServiceItemAdapter.ViewHolder> {
+public class ServiceItemAdapter extends BaseAdapter {
 
-    @NonNull
-    @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        ItemServiceBinding binding = ItemServiceBinding.inflate(LayoutInflater.from(context), parent, false);
-        return new ViewHolder(binding.getRoot(), binding);
+    private final List<Service> services;
+    private final LayoutInflater inflate;
+
+    public ServiceItemAdapter(Context context, List<Service> services) {
+        this.services = services;
+        this.inflate = LayoutInflater.from(context);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Service service = services.get(position);
-        holder.binding.setService(service);
-    }
-
-    @Override
-    public int getItemCount() {
+    public int getCount() {
         return services.size();
     }
 
-    public interface OnItemClickListener {
-        void onclick();
+    @Override
+    public Object getItem(int position) {
+        return services.get(position);
     }
 
-    private final Context context;
-    private final OnItemClickListener clickListener;
-    private List<Service> services;
-
-    public ServiceItemAdapter(Context context, List<Service> services, OnItemClickListener clickListener) {
-        this.context = context;
-        this.clickListener = clickListener;
-        this.services = services;
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        Service service = services.get(position);
+        ViewHolder viewHolder;
 
-    public void setServices(List<Service> services) {
-        this.services = services;
+        if (convertView == null) {
+            ItemServiceBinding binding =  ItemServiceBinding.inflate(inflate, parent, false);
+            viewHolder = new ViewHolder(binding);
+            convertView = binding.getRoot();
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = ((ViewHolder) convertView.getTag());
+        }
+
+        viewHolder.binding.setService(service);
+
+        return convertView;
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder{
+    static class ViewHolder{
 
-        public final ItemServiceBinding binding;
+        public ItemServiceBinding binding;
 
-        private ViewHolder(@NonNull View view, ItemServiceBinding binding) {
-            super(view);
+        public ViewHolder(ItemServiceBinding binding) {
             this.binding = binding;
         }
     }
-
 
 }

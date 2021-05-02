@@ -6,13 +6,20 @@ public class Characteristic {
 
     private String uuid;
 
+    private String service;
+
     private String usage;
 
     private String proprty;
 
-    public Characteristic(String name, String uuid, String usage, String proprty) {
+    private boolean select;
+
+    private boolean selectAble;
+
+    public Characteristic(String name, String uuid, String service, String usage, String proprty) {
         this.name = name;
         this.uuid = uuid;
+        this.service = service;
         this.usage = usage;
         this.proprty = proprty;
     }
@@ -33,6 +40,14 @@ public class Characteristic {
         this.uuid = uuid;
     }
 
+    public String getService() {
+        return service;
+    }
+
+    public void setService(String service) {
+        this.service = service;
+    }
+
     public String getUsage() {
         return usage;
     }
@@ -47,5 +62,28 @@ public class Characteristic {
 
     public void setProprty(String proprty) {
         this.proprty = proprty;
+    }
+
+    public boolean isSelect() {
+        return select;
+    }
+
+    public void setSelect(boolean select) {
+        this.select = select;
+    }
+
+    public boolean isSelectAble() {
+        return selectAble;
+    }
+
+    public void setSelectAble(boolean selectAble) {
+        this.selectAble = selectAble;
+    }
+
+    @Override
+    public String toString() {
+        return "Characteristic{" +
+                "name='" + name + '\'' +
+                '}';
     }
 }

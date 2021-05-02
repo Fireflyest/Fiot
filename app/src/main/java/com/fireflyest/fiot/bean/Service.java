@@ -8,6 +8,8 @@ public class Service {
 
     private String usage;
 
+    private boolean select;
+
     public Service(String name, String uuid, String usage) {
         this.name = name;
         this.uuid = uuid;
@@ -36,5 +38,20 @@ public class Service {
 
     public void setUsage(String usage) {
         this.usage = usage;
+    }
+
+    public boolean isSelect() {
+        return select;
+    }
+
+    public void setSelect(boolean select) {
+        this.select = select;
+    }
+
+    @Override
+    public String toString() {
+        return "Service{" +
+                "name='" + name + '\'' +
+                '}';
     }
 }

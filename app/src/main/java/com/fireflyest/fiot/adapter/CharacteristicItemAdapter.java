@@ -4,62 +4,65 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+import android.widget.BaseAdapter;
 
 import com.fireflyest.fiot.bean.Characteristic;
+import com.fireflyest.fiot.bean.Service;
 import com.fireflyest.fiot.databinding.ItemCharacteristicBinding;
+import com.fireflyest.fiot.databinding.ItemServiceBinding;
 
 import java.util.List;
 
-public class CharacteristicItemAdapter extends RecyclerView.Adapter<CharacteristicItemAdapter.ViewHolder> {
+public class CharacteristicItemAdapter extends BaseAdapter {
 
-    @NonNull
-    @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        ItemCharacteristicBinding binding = ItemCharacteristicBinding.inflate(LayoutInflater.from(context), parent, false);
-        return new ViewHolder(binding.getRoot(), binding);
+    private final List<Characteristic> characteristics;
+    private final LayoutInflater inflate;
+
+    public CharacteristicItemAdapter(Context context, List<Characteristic> characteristics) {
+        this.characteristics = characteristics;
+        this.inflate = LayoutInflater.from(context);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Characteristic characteristic = characteristics.get(position);
-        holder.binding.setCharacteristic(characteristic);
-    }
-
-    @Override
-    public int getItemCount() {
+    public int getCount() {
         return characteristics.size();
     }
 
-    public interface OnItemClickListener {
-        void onclick();
+    @Override
+    public Object getItem(int position) {
+        return characteristics.get(position);
     }
 
-    private final Context context;
-    private final OnItemClickListener clickListener;
-    private List<Characteristic> characteristics;
-
-    public CharacteristicItemAdapter(Context context, List<Characteristic> characteristics, OnItemClickListener clickListener) {
-        this.context = context;
-        this.clickListener = clickListener;
-        this.characteristics = characteristics;
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
-    public void setCharacteristics(List<Characteristic> characteristics) {
-        this.characteristics = characteristics;
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        Characteristic characteristic = characteristics.get(position);
+        ViewHolder viewHolder;
+        if (convertView == null) {
+            ItemCharacteristicBinding binding =  ItemCharacteristicBinding.inflate(inflate, parent, false);
+            viewHolder = new ViewHolder(binding);
+            convertView = binding.getRoot();
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = ((ViewHolder) convertView.getTag());
+        }
+
+        viewHolder.binding.setCharacteristic(characteristic);
+
+        return convertView;
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder{
+    static class ViewHolder{
 
-        public final ItemCharacteristicBinding binding;
+        public ItemCharacteristicBinding binding;
 
-        private ViewHolder(@NonNull View view, ItemCharacteristicBinding binding) {
-            super(view);
+        public ViewHolder(ItemCharacteristicBinding binding) {
             this.binding = binding;
         }
     }
-
 
 }

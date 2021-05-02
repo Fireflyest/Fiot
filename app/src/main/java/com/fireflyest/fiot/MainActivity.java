@@ -36,7 +36,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_BLUETOOTH = 1;
-    private static final String TAG = "MainActivity";
+    public static final String TAG = MainActivity.class.getSimpleName();
 
     private ActivityMainBinding binding;
     private MainViewModel model;

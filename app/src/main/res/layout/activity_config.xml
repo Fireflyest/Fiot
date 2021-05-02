@@ -31,46 +31,39 @@
             app:navigationIcon="@drawable/ic_back"
             app:layout_constraintTop_toTopOf="parent"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/config_service"
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/config_bluetooth"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:background="@drawable/round_white"
-            android:layout_marginTop="22dp"
-            android:paddingVertical="12dp"
-            android:layoutAnimation="@anim/layout_animation_slide_left"
-            tools:listitem="@layout/item_service"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintTop_toBottomOf="@+id/config_toolbar"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/config_arrow"/>
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="22dp"
+            android:text="@string/bluetooth_config"/>
 
-        <ImageView
-            android:id="@+id/config_arrow"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            app:layout_constraintEnd_toStartOf="@+id/config_service"
-            app:layout_constraintStart_toEndOf="@+id/config_characteristic"
-            app:layout_constraintTop_toTopOf="@+id/config_service"
-            app:layout_constraintBottom_toBottomOf="@+id/config_service"
-            android:src="@drawable/ic_back"
-            android:contentDescription="@string/to" />
+        <Spinner
+            android:id="@+id/config_service"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/round_white"
+            tools:listitem="@layout/item_service"
+            app:layout_constraintTop_toBottomOf="@+id/config_bluetooth"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="12dp"
+            android:layout_marginHorizontal="12dp"/>
 
-        <androidx.recyclerview.widget.RecyclerView
+        <Spinner
             android:id="@+id/config_characteristic"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
             android:background="@drawable/round_white"
-            android:paddingVertical="12dp"
             tools:listitem="@layout/item_characteristic"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintTop_toTopOf="@+id/config_service"
-            app:layout_constraintBottom_toBottomOf="@+id/config_service"
+            app:layout_constraintTop_toBottomOf="@+id/config_service"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/config_arrow"/>
-
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="12dp"
+            android:layout_marginHorizontal="12dp"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

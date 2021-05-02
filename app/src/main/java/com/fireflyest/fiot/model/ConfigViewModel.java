@@ -2,11 +2,13 @@ package com.fireflyest.fiot.model;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
+import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.fireflyest.fiot.bean.Characteristic;
+import com.fireflyest.fiot.bean.Device;
 import com.fireflyest.fiot.bean.Service;
 import com.fireflyest.fiot.service.BluetoothIntentService;
 
@@ -15,38 +17,60 @@ import java.util.List;
 
 public class ConfigViewModel extends ViewModel {
 
+    public static final String TAG = "ConfigViewModel";
+
     private final MutableLiveData<List<Service>> servicesData = new MutableLiveData<>();
 
     private final MutableLiveData<List<Characteristic>> characteristicsData = new MutableLiveData<>();
+
+    private final MutableLiveData<Device> deviceData = new MutableLiveData<>();
+
+    private List<BluetoothGattService> services;
 
     public ConfigViewModel() {
     }
 
     public void initView(String address){
-        List<BluetoothGattService> services = BluetoothIntentService.getService(address);
+        services = BluetoothIntentService.getService(address);
         if (services == null) {
             return;
         }
         List<Service> s = new ArrayList<>();
         for (BluetoothGattService service : services) {
             String uuidService = service.getUuid().toString();
-            s.add(new Service(uuidService.substring(0, 8), uuidService, this.getServiceUsage(uuidService.substring(4, 8))));
+            Service se = new Service(uuidService.substring(4, 8), uuidService, this.getServiceUsage(uuidService.substring(4, 8)));
+            s.add(se);
         }
         servicesData.setValue(s);
-        this.setCharacteristics(services.get(0));
     }
 
-    public void setCharacteristics(BluetoothGattService service){
+    public void selectCharacteristic(String serviceUuid){
+        BluetoothGattService service = null;
+        for (BluetoothGattService s : services) {
+            if (!s.getUuid().toString().equals(serviceUuid)) continue;
+            service = s;
+            break;
+        }
+        if (service == null) {
+            Log.e(TAG, "initCharacteristic -> 服务未找到" + serviceUuid);
+            return;
+        }
         List<Characteristic> c = new ArrayList<>();
         for (BluetoothGattCharacteristic characteristic : service.getCharacteristics()) {
-            StringBuilder characteristicBuilder = new StringBuilder();
             String uuidCharacteristic = characteristic.getUuid().toString();
-            c.add(new Characteristic(uuidCharacteristic.substring(0, 8),
-                            uuidCharacteristic,
-                            this.getServiceUsage(uuidCharacteristic.substring(4, 8)),
-                            this.getProprty(characteristic.getProperties())));
+            Characteristic ch = new Characteristic(uuidCharacteristic.substring(4, 8),
+                    uuidCharacteristic,
+                    serviceUuid,
+                    this.getCharacteristicUsage(uuidCharacteristic.substring(4, 8)),
+                    this.getProprty(characteristic.getProperties()));
+            // 可写的话可选择
+            if ((characteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_WRITE) != 0)  ch.setSelectAble(true);
+            c.add(ch);
+            Log.d(TAG, "BluetoothGattCharacteristic -> " + ch.toString());
         }
+        Log.d(TAG, "characteristicsMap.put(service.getUuid().toString(), c) -> " + c.toString());
         characteristicsData.setValue(c);
+        Log.d(TAG, "------------------------------------------------------------------");
     }
 
     public MutableLiveData<List<Service>> getServicesData() {
@@ -57,6 +81,10 @@ public class ConfigViewModel extends ViewModel {
         return characteristicsData;
     }
 
+    public MutableLiveData<Device> getDeviceData() {
+        return deviceData;
+    }
+
     /**
      * 获取特征可操作的
      * @param p Proprty
@@ -64,16 +92,16 @@ public class ConfigViewModel extends ViewModel {
      */
     private String getProprty(int p) {
         StringBuilder builder = new StringBuilder();
-        if ((p & 0x01) != 0) builder.append("广播,");
-        if ((p & 0x02) != 0) builder.append("读取,");
-        if ((p & 0x04) != 0) builder.append("无回应写入,");
-        if ((p & 0x08) != 0) builder.append("写入,");
-        if ((p & 0x10) != 0) builder.append("反馈信息,");
-        if ((p & 0x20) != 0) builder.append("指示,");
-        if ((p & 0x40) != 0) builder.append("带签名写入,");
-        if ((p & 0x80) != 0) builder.append("扩展属性,");
+        if ((p & BluetoothGattCharacteristic.PROPERTY_BROADCAST) != 0) builder.append("广播,");
+        if ((p & BluetoothGattCharacteristic.PROPERTY_READ) != 0) builder.append("读取,");
+        if ((p & BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) != 0) builder.append("无回应写入,");
+        if ((p & BluetoothGattCharacteristic.PROPERTY_WRITE) != 0) builder.append("写入,");
+        if ((p & BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0) builder.append("反馈信息,");
+        if ((p & BluetoothGattCharacteristic.PROPERTY_INDICATE) != 0) builder.append("指示,");
+        if ((p & BluetoothGattCharacteristic.PROPERTY_SIGNED_WRITE) != 0) builder.append("带签名写入,");
+        if ((p & BluetoothGattCharacteristic.PROPERTY_EXTENDED_PROPS) != 0) builder.append("扩展属性,");
         String string = builder.toString();
-        return string.substring(0, string.length()-1);
+        return "[" + string.substring(0, string.length()-1) + "]";
     }
 
     /**
@@ -86,7 +114,7 @@ public class ConfigViewModel extends ViewModel {
         switch (name.toUpperCase()){
             case "1800": return "通用访问";
             case "1811": return "闹钟通知";
-            case "1815": return "自动化输入输出";
+            case "1815": return "自动化IO";
             case "180F": return "电池数据";
             case "183B": return "二元传感器";
             case "1810": return "血压";
@@ -174,11 +202,11 @@ public class ConfigViewModel extends ViewModel {
             case "2B2C": return "BSS回应";
             case "2AA8": return "CGM功能";
             case "2AA7": return "CGM测量";
-            case "0x2AAB": return "CGM会话运行时间";
-            case "0x2AAA": return "CGM会话开始时间";
-            case "0x2AAC": return "CGM特定操作控制点";
+            case "2AAB": return "CGM会话运行时间";
+            case "2AAA": return "CGM会话开始时间";
+            case "2AAC": return "CGM特定操作控制点";
             case "2AA9": return "CGM状态";
-            case "0x2ACE": return "交叉训练员数据";
+            case "2ACE": return "交叉训练员数据";
             case "2A5C": return "CSC功能";
             case "2A5B": return "CSC测量";
             case "2A2B": return "当前时间";
@@ -209,8 +237,8 @@ public class ConfigViewModel extends ViewModel {
             case "2A26": return "固件修订字符";
             case "2A8A": return "名字";
             case "2AD9": return "健身设备控制点";
-            case "0x2ACC": return "健身设备功能";
-            case "0x2ADA": return "健身设备状态";
+            case "2ACC": return "健身设备功能";
+            case "2ADA": return "健身设备状态";
             case "2A8B": return "五区心率限制";
             case "2AB2": return "楼层号";
             case "2AA6": return "中央地址解析";
@@ -233,11 +261,11 @@ public class ConfigViewModel extends ViewModel {
             case "2A4C": return "HID控制点";
             case "2A4A": return "HID信息";
             case "2A8F": return "臀围";
-            case "0x2ABA": return "HTTP控制点";
+            case "2ABA": return "HTTP控制点";
             case "2AB9": return "HTTP实体主体";
             case "2AB7": return "HTTP头";
             case "2AB8": return "HTTP状态码";
-            case "0x2ABB": return "HTTPS安全性";
+            case "2ABB": return "HTTPS安全性";
             case "2A6F": return "湿度";
             case "2B22": return "IDD通告状态";
             case "2B25": return "IDD命令控制点";
@@ -250,13 +278,13 @@ public class ConfigViewModel extends ViewModel {
             case "2B24": return "IDD状态读取器控制点";
             case "2A2A": return "IEEE 11073-20601法规认证数据列表";
             case "2AD2": return "室内自行车数据";
-            case "0x2AAD": return "室内定位配置";
+            case "2AAD": return "室内定位配置";
             case "2A36": return "中间的气囊压力";
             case "2A1E": return "中间的温度";
             case "2A77": return "辐照度";
             case "2AA2": return "语言";
             case "2A90": return "姓";
-            case "0x2AAE": return "纬度";
+            case "2AAE": return "纬度";
             case "2A6B": return "LN控制点";
             case "2A6A": return "LN功能";
             case "2AB1": return "当地东部坐标";
@@ -264,7 +292,7 @@ public class ConfigViewModel extends ViewModel {
             case "2A0F": return "当地时间信息";
             case "2A67": return "位置和速度特征";
             case "2AB5": return "地点名称";
-            case "0x2AAF": return "经度";
+            case "2AAF": return "经度";
             case "2A2C": return "磁偏角";
             case "2AA0": return "磁通密度– 2D";
             case "2AA1": return "磁通密度– 3D";
@@ -282,11 +310,11 @@ public class ConfigViewModel extends ViewModel {
             case "2AC2": return "上次修改的对象";
             case "2AC6": return "对象列表控制点";
             case "2AC7": return "对象列表过滤器";
-            case "0x2ABE": return "对象名称";
+            case "2ABE": return "对象名称";
             case "2AC4": return "对象属性";
             case "2AC0": return "对象大小";
-            case "0x2ABF": return "对象类型";
-            case "0x2ABD": return "OTS功能";
+            case "2ABF": return "对象类型";
+            case "2ABD": return "OTS功能";
             case "2A5F": return "PLX连续测量特性";
             case "2A60": return "PLX功能";
             case "2A5E": return "PLX抽查检查";
@@ -326,7 +354,7 @@ public class ConfigViewModel extends ViewModel {
             case "2A28": return "软件修订版字符";
             case "2A93": return "有氧阈值和无氧阈值的运动类型";
             case "2AD0": return "攀登楼梯数";
-            case "0x2ACF": return "攀登者步数";
+            case "2ACF": return "攀登者步数";
             case "2A3D": return "字符串";
             case "2AD7": return "支持的心率范围";
             case "2AD5": return "支持的倾斜范围";
@@ -336,7 +364,7 @@ public class ConfigViewModel extends ViewModel {
             case "2AD4": return "支持的速度范围";
             case "2A48": return "支持的未读警报类别";
             case "2A23": return "系统编号";
-            case "0x2ABC": return "TDS控制点";
+            case "2ABC": return "TDS控制点";
             case "2A6E": return "温度";
             case "2A1F": return "温度摄氏";
             case "2A20": return "温度华氏度";
@@ -351,7 +379,7 @@ public class ConfigViewModel extends ViewModel {
             case "2A11": return "夏令时";
             case "2A0E": return "时区";
             case "2AD3": return "训练状况";
-            case "0x2ACD": return "跑步机数据";
+            case "2ACD": return "跑步机数据";
             case "2A71": return "真风向";
             case "2A70": return "真风速";
             case "2A95": return "两区心率限制";
