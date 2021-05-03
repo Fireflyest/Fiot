@@ -22,4 +22,12 @@
     <string name="config">配置</string>
     <string name="command_hex">0x</string>
     <string name="bluetooth_config">蓝牙配置</string>
+    <string name="hex">十六进制收发数据</string>
+    <string name="bluetooth_address">蓝牙地址</string>
+    <string name="create_time">创建于:</string>
+    <string name="auto_connect">自动连接</string>
+    <string name="general_config">通用配置</string>
+    <string name="display">主页展示</string>
+    <string name="web_config">网络配置</string>
+    <string name="save">保存</string>
 </resources>

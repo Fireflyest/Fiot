@@ -16,6 +16,13 @@ public class Characteristic {
 
     private boolean selectAble;
 
+    public Characteristic() {
+    }
+
+    public Characteristic(String name) {
+        this.name = name;
+    }
+
     public Characteristic(String name, String uuid, String service, String usage, String proprty) {
         this.name = name;
         this.uuid = uuid;

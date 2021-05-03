@@ -3,7 +3,11 @@ package com.fireflyest.fiot.bean;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Device implements Parcelable {
+import androidx.annotation.NonNull;
+
+import java.util.Objects;
+
+public class Device implements Parcelable, Cloneable {
 
     private long id;
 
@@ -131,6 +135,40 @@ public class Device implements Parcelable {
                 ", connect=" + connect +
                 ", type=" + type +
                 '}';
+    }
+
+    /**
+     * 只判断数据是否一样就行
+     * @param o 要对比的对象
+     * @return 是否数据相同
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Device device = (Device) o;
+
+        if (id != device.id) return false;
+        if (create != device.create) return false;
+        if (display != device.display) return false;
+        if (connect != device.connect) return false;
+        return type == device.type;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (nickname != null ? nickname.hashCode() : 0);
+        result = 31 * result + (address != null ? address.hashCode() : 0);
+        result = 31 * result + (service != null ? service.hashCode() : 0);
+        result = 31 * result + (characteristic != null ? characteristic.hashCode() : 0);
+        result = 31 * result + (int) (create ^ (create >>> 32));
+        result = 31 * result + (display ? 1 : 0);
+        result = 31 * result + (connect ? 1 : 0);
+        result = 31 * result + type;
+        return result;
     }
 
     @Override

@@ -10,6 +10,13 @@ public class Service {
 
     private boolean select;
 
+    public Service() {
+    }
+
+    public Service(String name) {
+        this.name = name;
+    }
+
     public Service(String name, String uuid, String usage) {
         this.name = name;
         this.uuid = uuid;

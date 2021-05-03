@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothGattService;
 import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModel;
 
 import com.fireflyest.fiot.bean.Characteristic;
@@ -19,6 +20,8 @@ public class ConfigViewModel extends ViewModel {
 
     public static final String TAG = "ConfigViewModel";
 
+    private SavedStateHandle handle;
+
     private final MutableLiveData<List<Service>> servicesData = new MutableLiveData<>();
 
     private final MutableLiveData<List<Characteristic>> characteristicsData = new MutableLiveData<>();
@@ -30,7 +33,11 @@ public class ConfigViewModel extends ViewModel {
     public ConfigViewModel() {
     }
 
-    public void initView(String address){
+    public ConfigViewModel(SavedStateHandle handle) {
+        this.handle = handle;
+    }
+
+    public void initServiceData(String address){
         services = BluetoothIntentService.getService(address);
         if (services == null) {
             return;
@@ -44,7 +51,7 @@ public class ConfigViewModel extends ViewModel {
         servicesData.setValue(s);
     }
 
-    public void selectCharacteristic(String serviceUuid){
+    public void selectService(String serviceUuid){
         BluetoothGattService service = null;
         for (BluetoothGattService s : services) {
             if (!s.getUuid().toString().equals(serviceUuid)) continue;

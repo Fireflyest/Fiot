@@ -1,16 +1,21 @@
 package com.fireflyest.fiot;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.CompoundButton;
 
 import com.fireflyest.fiot.adapter.CharacteristicItemAdapter;
 import com.fireflyest.fiot.adapter.ServiceItemAdapter;
@@ -19,8 +24,8 @@ import com.fireflyest.fiot.bean.Device;
 import com.fireflyest.fiot.bean.Service;
 import com.fireflyest.fiot.databinding.ActivityConfigBinding;
 import com.fireflyest.fiot.model.ConfigViewModel;
-import com.fireflyest.fiot.util.CalendarUtil;
 import com.fireflyest.fiot.util.StatusBarUtil;
+import com.fireflyest.fiot.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +44,14 @@ public class ConfigActivity extends AppCompatActivity {
     private final List<Service> services = new ArrayList<>();
     private final List<Characteristic> characteristics = new ArrayList<>();
 
+    private Device rawDevice;
+    private boolean saved;
+
+    public static final String EXTRA_SAVE_DEVICE = // 保存的设备
+            "com.fireflyest.fiot.activity.extra.SAVE_DEVICE";
+    public static final String EXTRA_EDIT_DEVICE = // 更改的设备
+            "com.fireflyest.fiot.activity.extra.EDIT_DEVICE";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +61,15 @@ public class ConfigActivity extends AppCompatActivity {
 
         this.initView();
 
+//        // 已保存的数据
+//        if (savedInstanceState != null) {
+//            saveDevice = savedInstanceState.getParcelable(EXTRA_SAVE_DEVICE);
+//            editDevice = savedInstanceState.getParcelable(EXTRA_EDIT_DEVICE);
+//        }else {
+//        }
+
+        this.initData();
+
     }
 
     private void initView() {
@@ -55,61 +77,102 @@ public class ConfigActivity extends AppCompatActivity {
 
         setSupportActionBar(binding.configToolbar);
 
+        // 服务特征列表适配器
         serviceItemAdapter = new ServiceItemAdapter(this, services);
         characteristicItemAdapter = new CharacteristicItemAdapter(this, characteristics);
         binding.configService.setAdapter(serviceItemAdapter);
         binding.configCharacteristic.setAdapter(characteristicItemAdapter);
-        binding.configService.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Service service = services.get(position);
-                String uuid = service.getUuid();
-                model.selectCharacteristic(uuid);
-            }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        binding.configCharacteristic.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        model.getCharacteristicsData().observe(this, c ->{
-            if (c != null) {
-                characteristics.clear();
-                characteristics.addAll(c);
-                Log.d(TAG, "CharacteristicsData ->" + c.toString());
-                characteristicItemAdapter.notifyDataSetChanged();
-            }
-        });
-
+        // 服务选项更新
         model.getServicesData().observe(this, s ->{
             if (s != null) {
                 services.clear();
+                // 放置一个空选项
+                services.add(new Service("点击选择服务"));
                 services.addAll(s);
                 Log.d(TAG, "ServicesData ->" + services.toString());
                 serviceItemAdapter.notifyDataSetChanged();
             }
         });
 
-        model.getDeviceData().observe(this, d -> {
-            binding.setDeviceName(d.getName());
-            binding.setCreateTime("创建于: " + CalendarUtil.convertTime(d.getCreate()));
-
-            model.initView(d.getAddress());
+        // 特征选项更新
+        model.getCharacteristicsData().observe(this, c ->{
+            if (c != null) {
+                characteristics.clear();
+                // 放置一个空选项
+                characteristics.add(new Characteristic("点击选择特征"));
+                characteristics.addAll(c);
+                Log.d(TAG, "CharacteristicsData ->" + c.toString());
+                characteristicItemAdapter.notifyDataSetChanged();
+            }
         });
 
+        // 监控设备数据更新
+        model.getDeviceData().observe(this, d -> {
+
+            this.saveRawDevice(d);
+            binding.setDevice(d);
+
+            // 更新蓝牙可选列表
+            model.initServiceData(d.getAddress());
+
+            // 如果设备有选择服务
+            if (d.getService() != null){
+                model.selectService(d.getService());
+            }
+            binding.configService.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    Service service = services.get(position);
+                    String uuid = service.getUuid();
+                    model.selectService(uuid);
+
+                    Log.d(TAG, "SelectedService -> " + uuid);
+                    binding.getDevice().setService(uuid);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                }
+            });
+
+            // 如果设备有选择特征
+            if (d.getCharacteristic() != null){
+                int index = this.indexOfCharacteristic(d.getCharacteristic());
+                binding.configCharacteristic.setSelection(index);
+            }
+            binding.configCharacteristic.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    Characteristic characteristic = characteristics.get(position);
+                    String uuid = characteristic.getUuid();
+
+                    Log.d(TAG, "SelectedCharacteristic -> " + uuid);
+                    binding.getDevice().setCharacteristic(uuid);
+                }
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                }
+            });
+
+            // 展示
+            binding.configDisplayText.setOnClickListener(v -> {
+                boolean display = binding.configDisplaySwitch.isChecked();
+                binding.configDisplaySwitch.setChecked(!display);
+            });
+
+            // 展示
+            binding.configAutoText.setOnClickListener(v -> {
+                boolean display = binding.configAutoSwitch.isChecked();
+                binding.configAutoSwitch.setChecked(!display);
+            });
+
+
+        });
+
+    }
+
+    private void initData() {
         Intent intent = getIntent();
         Device device = intent.getParcelableExtra(ControlActivity.EXTRA_DEVICE);
         if (device != null) {
@@ -117,13 +180,104 @@ public class ConfigActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 保存原有的设备来判断是否修改
+     * @param device 设备
+     */
+    private void saveRawDevice(Device device){
+        rawDevice = new Device(device.getId(),
+                device.getName(),
+                device.getAddress(),
+                device.isDisplay(),
+                device.getType(),
+                device.getCreate());
+        rawDevice.setNickname(device.getNickname());
+        rawDevice.setConnect(device.isConnect());
+        rawDevice.setService(device.getService());
+        rawDevice.setCharacteristic(device.getCharacteristic());
+    }
+
+    /**
+     * 返回上一个界面
+     */
+    private void back(){
+        Log.d(TAG, "back -> " + binding.getDevice().toString());
+        // 判断是否改变
+        if(!binding.getDevice().equals(rawDevice)){
+            AlertDialog saveDialog = new AlertDialog.Builder(this)
+                    .setTitle("保存")
+                    .setMessage("设备数据已更改，是否保存")
+                    .setNegativeButton("不保存", (dialog, which) -> {
+                        // 取消保存，直接回到上一个界面
+                        dialog.dismiss();
+                        this.finishAfterTransition();
+                    })
+                    .setNeutralButton("关闭", (dialog, which) -> dialog.cancel())
+                    .setPositiveButton("保存", (dialog, which) -> {
+                        // 保存数据
+                        this.saveDevice();
+                        dialog.dismiss();
+                        this.finishAfterTransition();
+                    })
+                    .create();
+            saveDialog.show();
+        }else {
+            // 未更改
+            this.finishAfterTransition();
+        }
+    }
+
+    public void saveDevice(){
+        // 数据库保存
+        // TODO: 2021/5/3 保存到数据库
+        // 提供给上一个界面
+        Intent intent = new Intent();
+        intent.putExtra(ControlActivity.EXTRA_DEVICE, binding.getDevice());
+        this.setResult(Activity.RESULT_OK, intent);
+        // 更新原数据
+        this.saveRawDevice(binding.getDevice());
+        // 将更改完的设备保存
+        ToastUtil.showShort(this, "保存成功");
+        saved = true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        this.back();
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+//        if (saveDevice != null) {
+//            outState.putParcelable(ControlActivity.EXTRA_DEVICE, saveDevice);
+//        }
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        this.getMenuInflater().inflate(R.menu.menu_config, menu);
+        return true;
+    }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == android.R.id.home){
-            finishAfterTransition();
+        int id = item.getItemId();
+        if (id == android.R.id.home){
+            this.back();
+        }else if(id == R.id.menu_save){
+            this.saveDevice();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private int indexOfCharacteristic(String uuid){
+        int i = 0;
+        for (Characteristic characteristic : characteristics) {
+            if (characteristic.getUuid().equals(uuid)) return i;
+            i++;
+        }
+        return -1;
     }
 
 }

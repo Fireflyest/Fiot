@@ -6,11 +6,9 @@
 
     <data>
         <variable
-            name="device_name"
-            type="String" />
-        <variable
-            name="create_time"
-            type="String" />
+            name="device"
+            type="com.fireflyest.fiot.bean.Device" />
+        <import type="com.fireflyest.fiot.util.CalendarUtil"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -24,22 +22,117 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/colorOnSurface"
+            app:menu="@menu/menu_config"
             app:titleTextAppearance="@style/text_title"
             app:subtitleTextAppearance="@style/text_subtitle"
-            app:title="@{device_name}"
-            app:subtitle="@{create_time}"
+            app:title="@{device.name}"
+            app:subtitle="@{@string/create_time + CalendarUtil.convertTime(device.create)}"
             app:navigationIcon="@drawable/ic_back"
             app:layout_constraintTop_toTopOf="parent"/>
 
         <TextView
-            android:id="@+id/config_bluetooth"
+            android:id="@+id/config_general_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:theme="@style/text_tip"
             app:layout_constraintTop_toBottomOf="@+id/config_toolbar"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginStart="12dp"
             android:layout_marginTop="22dp"
+            android:text="@string/general_config"/>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/config_general_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/round_white"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginTop="12dp"
+            android:padding="12dp"
+            app:layout_constraintTop_toBottomOf="@+id/config_general_text">
+
+            <TextView
+                android:id="@+id/config_display_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:theme="@style/text_bold"
+                android:textColor="?attr/colorSecondaryVariant"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:text="@string/display"/>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/config_display_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:theme="@style/layout_theme"
+                android:checked="@={device.display}"
+                app:layout_constraintTop_toTopOf="@+id/config_display_text"
+                app:layout_constraintBottom_toBottomOf="@+id/config_display_text"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/config_bluetooth_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:theme="@style/text_tip"
+            app:layout_constraintTop_toBottomOf="@+id/config_general_box"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="22dp"
             android:text="@string/bluetooth_config"/>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/config_bluetooth_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/round_white"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginTop="12dp"
+            android:padding="12dp"
+            app:layout_constraintTop_toBottomOf="@+id/config_bluetooth_text">
+
+            <TextView
+                android:id="@+id/config_address_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:theme="@style/text_bold"
+                android:textColor="?attr/colorSecondaryVariant"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:text="@string/bluetooth_address"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="@+id/config_address_text"
+                app:layout_constraintBottom_toBottomOf="@+id/config_address_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:text="@{device.address}" />
+
+            <TextView
+                android:id="@+id/config_auto_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:theme="@style/text_bold"
+                android:textColor="?attr/colorSecondaryVariant"
+                app:layout_constraintTop_toBottomOf="@+id/config_address_text"
+                app:layout_constraintStart_toStartOf="parent"
+                android:text="@string/auto_connect"/>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/config_auto_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:theme="@style/layout_theme"
+                app:layout_constraintTop_toTopOf="@+id/config_auto_text"
+                app:layout_constraintBottom_toBottomOf="@+id/config_auto_text"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <Spinner
             android:id="@+id/config_service"
@@ -47,7 +140,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/round_white"
             tools:listitem="@layout/item_service"
-            app:layout_constraintTop_toBottomOf="@+id/config_bluetooth"
+            app:layout_constraintTop_toBottomOf="@+id/config_bluetooth_box"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="12dp"
@@ -64,6 +157,29 @@
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="12dp"
             android:layout_marginHorizontal="12dp"/>
+
+        <TextView
+            android:id="@+id/config_web_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:theme="@style/text_tip"
+            app:layout_constraintTop_toBottomOf="@+id/config_characteristic"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="22dp"
+            android:text="@string/web_config"/>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/config_web_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/round_white"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginTop="12dp"
+            android:padding="12dp"
+            app:layout_constraintTop_toBottomOf="@+id/config_web_text">
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
