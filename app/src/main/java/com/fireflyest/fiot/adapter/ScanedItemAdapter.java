@@ -5,8 +5,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.fireflyest.fiot.R;
 import com.fireflyest.fiot.bean.Scaned;
 import com.fireflyest.fiot.databinding.ItemScanedBinding;
+import com.fireflyest.fiot.util.AnimationUtils;
 
 import java.util.List;
 
@@ -27,13 +26,11 @@ public class ScanedItemAdapter extends RecyclerView.Adapter<ScanedItemAdapter.Vi
     private final Context context;
     private final List<Scaned> scaneds;
 
-    private final Animation clickAnimation;
 
     public ScanedItemAdapter(Context context, List<Scaned> scaneds, OnItemClickListener clickListener) {
         this.context = context;
         this.scaneds = scaneds;
         this.clickListener = clickListener;
-        clickAnimation = AnimationUtils.loadAnimation(context, R.anim.item_down);
     }
 
     @NonNull
@@ -86,7 +83,7 @@ public class ScanedItemAdapter extends RecyclerView.Adapter<ScanedItemAdapter.Vi
         }
         holder.itemView.setOnClickListener(v -> {
             if (clickListener != null) {
-                v.startAnimation(clickAnimation);
+                AnimationUtils.down(v);
                 clickListener.onclick(scaned.getName(), scaned.getAddress());
             }
         });

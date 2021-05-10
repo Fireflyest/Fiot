@@ -11,7 +11,7 @@ import androidx.lifecycle.ViewModel;
 import com.fireflyest.fiot.bean.Characteristic;
 import com.fireflyest.fiot.bean.Device;
 import com.fireflyest.fiot.bean.Service;
-import com.fireflyest.fiot.service.BluetoothIntentService;
+import com.fireflyest.fiot.service.BleIntentService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,14 +38,14 @@ public class ConfigViewModel extends ViewModel {
     }
 
     public void initServiceData(String address){
-        services = BluetoothIntentService.getService(address);
+        services = BleIntentService.getService(address);
         if (services == null) {
             return;
         }
         List<Service> s = new ArrayList<>();
         for (BluetoothGattService service : services) {
             String uuidService = service.getUuid().toString();
-            Service se = new Service(uuidService.substring(4, 8), uuidService, this.getServiceUsage(uuidService.substring(4, 8)));
+            Service se = new Service(uuidService.substring(0, 8), uuidService, this.getServiceUsage(uuidService.substring(4, 8)));
             s.add(se);
         }
         servicesData.setValue(s);
@@ -65,7 +65,7 @@ public class ConfigViewModel extends ViewModel {
         List<Characteristic> c = new ArrayList<>();
         for (BluetoothGattCharacteristic characteristic : service.getCharacteristics()) {
             String uuidCharacteristic = characteristic.getUuid().toString();
-            Characteristic ch = new Characteristic(uuidCharacteristic.substring(4, 8),
+            Characteristic ch = new Characteristic(uuidCharacteristic.substring(0, 8),
                     uuidCharacteristic,
                     serviceUuid,
                     this.getCharacteristicUsage(uuidCharacteristic.substring(4, 8)),

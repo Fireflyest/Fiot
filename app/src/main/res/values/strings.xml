@@ -30,4 +30,6 @@
     <string name="display">主页展示</string>
     <string name="web_config">网络配置</string>
     <string name="save">保存</string>
+    <string name="send">发送</string>
+    <string name="wait">…</string>
 </resources>

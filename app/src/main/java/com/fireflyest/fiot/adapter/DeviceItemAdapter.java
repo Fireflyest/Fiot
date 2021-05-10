@@ -6,8 +6,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,6 +16,7 @@ import com.fireflyest.fiot.data.DeviceType;
 import com.fireflyest.fiot.R;
 import com.fireflyest.fiot.bean.Device;
 import com.fireflyest.fiot.databinding.ItemDeviceBinding;
+import com.fireflyest.fiot.util.AnimationUtils;
 
 import java.util.List;
 
@@ -63,32 +62,26 @@ public class DeviceItemAdapter extends RecyclerView.Adapter<DeviceItemAdapter.Vi
         // 如果没别称，设置别称
         if(device.getNickname() == null){
             String name = device.getName();
-            if(name != null && name.length() > 16) name = String.format("%s...", name.substring(0, 14));
+            if(name != null && name.length() > 15) name = String.format("%s...", name.substring(0, 13));
             device.setNickname(name);
         }
         holder.binding.setDevice(device);
         if (device.isConnect()){
-            if(device.getType() == DeviceType.NON || device.getType() == DeviceType.LOCAL){
-                holder.binding.setDot(blueDot);
-            }else {
-                holder.binding.setDot(greenDot);
-            }
+            holder.binding.setDot(blueDot);
         }else {
             holder.binding.setDot(grayDot);
         }
 
         holder.itemView.setOnClickListener(v -> {
+            if(device.isConnect()){
+                AnimationUtils.down(v);
+            }else {
+                AnimationUtils.click(v);
+            }
             if (clickListener != null) {
                 clickListener.onclick(device, holder.binding.deviceName);
 
             }
-            Animation clickAnimation;
-            if(device.isConnect()){
-                clickAnimation = AnimationUtils.loadAnimation(context, R.anim.item_down);
-            }else {
-                clickAnimation = AnimationUtils.loadAnimation(context, R.anim.item_click);
-            }
-            v.startAnimation(clickAnimation);
         });
         holder.itemView.setOnLongClickListener(v -> {
             if (longClickListener != null) {
@@ -112,9 +105,8 @@ public class DeviceItemAdapter extends RecyclerView.Adapter<DeviceItemAdapter.Vi
         notifyItemInserted(devices.size() - 1);
     }
 
-    public void updateItem(int index, Device device){
-        Log.d(TAG, "updateItem -> " + device.toString());
-        devices.set(index, device);
+    public void updateItem(int index){
+        Log.d(TAG, "updateItem -> " + index);
         notifyItemChanged(index);
     }
 

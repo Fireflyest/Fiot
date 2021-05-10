@@ -18,13 +18,11 @@ import android.view.ViewGroup;
 
 import com.fireflyest.fiot.ControlActivity;
 import com.fireflyest.fiot.R;
-import com.fireflyest.fiot.ScanActivity;
 import com.fireflyest.fiot.adapter.DeviceItemAdapter;
 import com.fireflyest.fiot.anim.DeviceItemAnimator;
-import com.fireflyest.fiot.bean.Device;
 import com.fireflyest.fiot.databinding.FragmentDeviceBinding;
 import com.fireflyest.fiot.model.MainViewModel;
-import com.fireflyest.fiot.service.BluetoothIntentService;
+import com.fireflyest.fiot.service.BleIntentService;
 
 public class DeviceFragment extends Fragment {
 
@@ -55,15 +53,15 @@ public class DeviceFragment extends Fragment {
         if (activity != null) activity.setSupportActionBar(binding.deviceToolbar);
         this.setHasOptionsMenu(true);
 
-        model.getBluetoothStateData().observe(this, state -> binding.setBluetoothState(state));
-        model.getNetStateData().observe(this, state -> binding.setNetState(state));
-        model.getServerData().observe(this, server -> binding.setServer(server));
+        model.getBluetoothStateData().observe(this.getViewLifecycleOwner(), state -> binding.setBluetoothState(state));
+        model.getNetStateData().observe(this.getViewLifecycleOwner(), state -> binding.setNetState(state));
+        model.getServerData().observe(this.getViewLifecycleOwner(), server -> binding.setServer(server));
 
-        model.getDeviceData().observe(this, device ->{
+        model.getDeviceData().observe(this.getViewLifecycleOwner(), device ->{
             // 判断是添加还是修改
             int index = model.getDeviceIndex(device.getAddress());
             if(-1 != index){
-                deviceItemAdapter.updateItem(index, device);
+                deviceItemAdapter.updateItem(index);
             }else {
                 deviceItemAdapter.addItem(device);
             }
@@ -79,7 +77,7 @@ public class DeviceFragment extends Fragment {
                 this.startActivity(intent, options.toBundle());
             }else {
                 // 未连接就先连接
-                BluetoothIntentService.connect(getContext(), device.getAddress());
+                BleIntentService.connect(getContext(), device.getAddress());
             }
         });
         deviceItemAdapter.setLongClickListener(device -> {

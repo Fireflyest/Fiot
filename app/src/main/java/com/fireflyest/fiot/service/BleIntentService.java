@@ -26,7 +26,7 @@ import java.util.UUID;
 /**
  * 用于蓝牙操作
  */
-public class BluetoothIntentService extends IntentService {
+public class BleIntentService extends IntentService {
 
     private final BluetoothAdapter bluetoothAdapter;
 
@@ -35,7 +35,7 @@ public class BluetoothIntentService extends IntentService {
 
     private static final UUID BLUETOOTH_NOTIFY_D = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
-    private static final String TAG = "BluetoothIntentService";
+    private static final String TAG = BleIntentService.class.getSimpleName();
 
     public static final String ACTION_GATT_CONNECT =// 连接
             "com.fireflyest.fiot.service.action.GATT_CONNECT";
@@ -64,15 +64,13 @@ public class BluetoothIntentService extends IntentService {
             "com.fireflyest.fiot.service.extra.ADDRESS";
     public static final String EXTRA_NAME =
             "com.fireflyest.fiot.service.extra.NAME";
-    public static final String EXTRA_RESULT = // 返回数据
-            "com.fireflyest.fiot.service.extra.RESULT";
     public static final String EXTRA_SERVICE = // 蓝牙服务
             "com.fireflyest.fiot.service.extra.SERVICE";
     public static final String EXTRA_CHARACTERISTIC = // 特征
             "com.fireflyest.fiot.service.extra.CHARACTERISTIC";
 
-    public BluetoothIntentService() {
-        super("BluetoothIntentService");
+    public BleIntentService() {
+        super("BleIntentService");
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     }
 
@@ -119,15 +117,17 @@ public class BluetoothIntentService extends IntentService {
             broadcastDataAction(ACTION_GATT_CHARACTERISTIC_READ, gatt.getDevice().getAddress(), characteristic.getValue());
         }
 
-//        @Override
-//        public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-//            // TODO: 2021/4/29
-//            if (status == BluetoothGatt.GATT_SUCCESS) {
-//                broadcastWriteSucceed(gatt.getDevice().getAddress(), status);
-//            } else {
-//                broadcastWriteSucceed(gatt.getDevice().getAddress(), status);
-//            }
-//        }
+        @Override
+        public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+            String address = gatt.getDevice().getAddress();
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                Log.d(TAG, "数据发送成功 -> " + new String(characteristic.getValue()));
+                broadcastDataAction(ACTION_GATT_CHARACTERISTIC_WRITE_SUCCEED, address, characteristic.getValue());
+            } else {
+                Log.d(TAG, "数据发送结果失败 -> " + new String(characteristic.getValue()));
+                broadcastDataAction(ACTION_GATT_CHARACTERISTIC_WRITE_FAIL, address, characteristic.getValue());
+            }
+        }
 
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
@@ -147,7 +147,7 @@ public class BluetoothIntentService extends IntentService {
      * @param address 地址
      */
     public static void connect(Context context, String address) {
-        Intent intent = new Intent(context, BluetoothIntentService.class);
+        Intent intent = new Intent(context, BleIntentService.class);
         intent.setAction(ACTION_GATT_CONNECT);
         intent.putExtra(EXTRA_ADDRESS, address);
         context.startService(intent);
@@ -159,7 +159,7 @@ public class BluetoothIntentService extends IntentService {
      * @param address 地址
      */
     public static void disconnect(Context context, String address) {
-        Intent intent = new Intent(context, BluetoothIntentService.class);
+        Intent intent = new Intent(context, BleIntentService.class);
         intent.setAction(ACTION_GATT_DISCONNECTED);
         intent.putExtra(EXTRA_ADDRESS, address);
         context.startService(intent);
@@ -172,7 +172,7 @@ public class BluetoothIntentService extends IntentService {
      * @param data 数据
      */
     public static void write(Context context, String address, String service, String characteristic, byte[] data){
-        Intent intent = new Intent(context, BluetoothIntentService.class);
+        Intent intent = new Intent(context, BleIntentService.class);
         intent.setAction(ACTION_GATT_CHARACTERISTIC_WRITE);
         intent.putExtra(EXTRA_ADDRESS, address);
         intent.putExtra(EXTRA_SERVICE, service);
@@ -182,7 +182,7 @@ public class BluetoothIntentService extends IntentService {
     }
 
     public static void readCharacteristic(Context context, String address, String service, String characteristic){
-        Intent intent = new Intent(context, BluetoothIntentService.class);
+        Intent intent = new Intent(context, BleIntentService.class);
         intent.setAction(ACTION_GATT_CHARACTERISTIC_READ);
         intent.putExtra(EXTRA_ADDRESS, address);
         intent.putExtra(EXTRA_SERVICE, service);
@@ -204,8 +204,6 @@ public class BluetoothIntentService extends IntentService {
 
         return super.onStartCommand(intent, flags, startId);
     }
-
-
 
     @Override
     protected void onHandleIntent(Intent intent) {
@@ -247,7 +245,7 @@ public class BluetoothIntentService extends IntentService {
             return;
         }
         // 非自动断连，断开后会尝试重新连接
-        this.disconnectList.remove(address);
+        disconnectList.remove(address);
 
         remoteDevice.connectGatt(this, false, gattCallback);
         Log.d(TAG, "正在连接蓝牙设备 -> " + address);
@@ -298,16 +296,14 @@ public class BluetoothIntentService extends IntentService {
             return;
         }
 
-        if((gattCharacteristic.getProperties() & BluetoothGattCharacteristic.PERMISSION_WRITE) == 0){
+        if((gattCharacteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_WRITE) == 0){
             broadcastDataAction(ACTION_GATT_CHARACTERISTIC_WRITE_FAIL, address, data);
             Log.e(TAG, "特征不支持写入 -> " + address);
             return;
         }
 
         gattCharacteristic.setValue(data);
-        boolean success = gatt.writeCharacteristic(gattCharacteristic);
-        broadcastDataAction(success ? ACTION_GATT_CHARACTERISTIC_WRITE_SUCCEED : ACTION_GATT_CHARACTERISTIC_WRITE_FAIL, address, data);
-        Log.e(TAG, "数据发送结果 -> " + (success ? "成功":"失败"));
+        gatt.writeCharacteristic(gattCharacteristic);
     }
 
     private void handleActionReadCharacteristic(String address, String service, String characteristic) {
@@ -354,17 +350,9 @@ public class BluetoothIntentService extends IntentService {
 
     private void broadcastDataAction(String action, String address, byte[] data){
         Intent intent = new Intent();
-        intent.setAction(BluetoothIntentService.ACTION_DATA_AVAILABLE);
+        intent.setAction(action);
         intent.putExtra(EXTRA_ADDRESS, address);
         intent.putExtra(EXTRA_DATA, data);
-        sendBroadcast(intent);
-    }
-
-    private void broadcastWriteSucceed(String address, int result){
-        Intent intent = new Intent();
-        intent.setAction(BluetoothIntentService.ACTION_GATT_CHARACTERISTIC_WRITE_SUCCEED);
-        intent.putExtra(EXTRA_ADDRESS, address);
-        intent.putExtra(EXTRA_RESULT, result);
         sendBroadcast(intent);
     }
 

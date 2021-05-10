@@ -45,7 +45,6 @@ public class ConfigActivity extends AppCompatActivity {
     private final List<Characteristic> characteristics = new ArrayList<>();
 
     private Device rawDevice;
-    private boolean saved;
 
     public static final String EXTRA_SAVE_DEVICE = // 保存的设备
             "com.fireflyest.fiot.activity.extra.SAVE_DEVICE";
@@ -113,37 +112,43 @@ public class ConfigActivity extends AppCompatActivity {
             this.saveRawDevice(d);
             binding.setDevice(d);
 
-            // 更新蓝牙可选列表
+            // 更新蓝牙服务可选列表
             model.initServiceData(d.getAddress());
 
-            // 如果设备有选择服务
-            if (d.getService() != null){
-                model.selectService(d.getService());
-            }
             binding.configService.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    if (position == 0) return;
                     Service service = services.get(position);
                     String uuid = service.getUuid();
                     model.selectService(uuid);
 
                     Log.d(TAG, "SelectedService -> " + uuid);
                     binding.getDevice().setService(uuid);
+
+                    // 如果设备有选择特征
+                    if (d.getCharacteristic() != null){
+                        int index = indexOfCharacteristic(d.getCharacteristic());
+                        Log.d(TAG, "device characteristic index -> " + index);
+                        binding.configCharacteristic.setSelection(index);
+                    }
                 }
 
                 @Override
                 public void onNothingSelected(AdapterView<?> parent) {
                 }
             });
-
-            // 如果设备有选择特征
-            if (d.getCharacteristic() != null){
-                int index = this.indexOfCharacteristic(d.getCharacteristic());
-                binding.configCharacteristic.setSelection(index);
+            // 如果设备有选择服务
+            if (d.getService() != null){
+                int index = indexOfService(d.getService());
+                Log.d(TAG, "device service index -> " + index);
+                binding.configService.setSelection(index);
             }
+
             binding.configCharacteristic.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    if (position == 0) return;
                     Characteristic characteristic = characteristics.get(position);
                     String uuid = characteristic.getUuid();
 
@@ -151,8 +156,7 @@ public class ConfigActivity extends AppCompatActivity {
                     binding.getDevice().setCharacteristic(uuid);
                 }
                 @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-                }
+                public void onNothingSelected(AdapterView<?> parent) { }
             });
 
             // 展示
@@ -185,12 +189,14 @@ public class ConfigActivity extends AppCompatActivity {
      * @param device 设备
      */
     private void saveRawDevice(Device device){
+        Log.d(TAG, "saveRawDevice -> " + device.toString());
         rawDevice = new Device(device.getId(),
                 device.getName(),
                 device.getAddress(),
                 device.isDisplay(),
                 device.getType(),
-                device.getCreate());
+                device.getCreate(),
+                device.isAuto());
         rawDevice.setNickname(device.getNickname());
         rawDevice.setConnect(device.isConnect());
         rawDevice.setService(device.getService());
@@ -201,7 +207,9 @@ public class ConfigActivity extends AppCompatActivity {
      * 返回上一个界面
      */
     private void back(){
-        Log.d(TAG, "back -> " + binding.getDevice().toString());
+        Log.d(TAG, "back after -> " + binding.getDevice().toString());
+        Log.d(TAG, "back raw-> " + rawDevice.toString());
+        Log.d(TAG, "数据更改 -> " + !binding.getDevice().equals(rawDevice));
         // 判断是否改变
         if(!binding.getDevice().equals(rawDevice)){
             AlertDialog saveDialog = new AlertDialog.Builder(this)
@@ -232,13 +240,16 @@ public class ConfigActivity extends AppCompatActivity {
         // TODO: 2021/5/3 保存到数据库
         // 提供给上一个界面
         Intent intent = new Intent();
+        // 未选择特征
+        if (binding.configCharacteristic.getSelectedItemPosition() == 0){
+            binding.getDevice().setCharacteristic(null);
+        }
         intent.putExtra(ControlActivity.EXTRA_DEVICE, binding.getDevice());
         this.setResult(Activity.RESULT_OK, intent);
         // 更新原数据
         this.saveRawDevice(binding.getDevice());
         // 将更改完的设备保存
         ToastUtil.showShort(this, "保存成功");
-        saved = true;
     }
 
     @Override
@@ -271,13 +282,24 @@ public class ConfigActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private int indexOfService(String uuid){
+        int i = 1;
+        for (Service service : services) {
+            if (service.getUuid() == null) continue;
+            if (service.getUuid().equals(uuid)) return i;
+            i++;
+        }
+        return 0;
+    }
+
     private int indexOfCharacteristic(String uuid){
-        int i = 0;
+        int i = 1;
         for (Characteristic characteristic : characteristics) {
+            if (characteristic.getUuid() == null) continue;
             if (characteristic.getUuid().equals(uuid)) return i;
             i++;
         }
-        return -1;
+        return 0;
     }
 
 }

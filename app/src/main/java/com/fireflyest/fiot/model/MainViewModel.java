@@ -8,7 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.fireflyest.fiot.bean.Device;
-import com.fireflyest.fiot.service.BluetoothIntentService;
+import com.fireflyest.fiot.service.BleIntentService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,22 +29,22 @@ public class MainViewModel extends ViewModel {
     private final BroadcastReceiver receiver =new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String address = intent.getStringExtra(BluetoothIntentService.EXTRA_ADDRESS);
+            String address = intent.getStringExtra(BleIntentService.EXTRA_ADDRESS);
             int index = getDeviceIndex(address);
             if(index == -1) return;
             Device device = devices.get(index);
             switch (intent.getAction()){
-                case BluetoothIntentService.ACTION_GATT_CONNECTED:
+                case BleIntentService.ACTION_GATT_CONNECTED:
                     if (device.isConnect()) return;
                     device.setConnect(true);
                     deviceData.setValue(device);
                     break;
-                case BluetoothIntentService.ACTION_GATT_CONNECT_LOSE:
+                case BleIntentService.ACTION_GATT_CONNECT_LOSE:
                     if (!device.isConnect()) return;
                     device.setConnect(false);
                     deviceData.setValue(device);
                     break;
-                case BluetoothIntentService.ACTION_DATA_AVAILABLE:
+                case BleIntentService.ACTION_DATA_AVAILABLE:
 
                     break;
                 default:

@@ -1,12 +1,9 @@
 package com.fireflyest.fiot;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -16,22 +13,17 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.util.TypedValue;
 import android.view.Menu;
-import android.view.View;
 import android.widget.TextView;
-import android.widget.ViewSwitcher;
 
 import com.fireflyest.fiot.adapter.ScanedItemAdapter;
 import com.fireflyest.fiot.anim.FallItemAnimator;
 import com.fireflyest.fiot.bean.Scaned;
 import com.fireflyest.fiot.databinding.ActivityScanBinding;
-import com.fireflyest.fiot.databinding.LayoutGiantTextBinding;
 import com.fireflyest.fiot.model.ScanViewModel;
-import com.fireflyest.fiot.service.BluetoothIntentService;
+import com.fireflyest.fiot.service.BleIntentService;
 import com.fireflyest.fiot.util.StatusBarUtil;
-import com.fireflyest.fiot.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,7 +73,7 @@ public class ScanActivity extends AppCompatActivity {
         List<Scaned> scaneds = new ArrayList<>();
         scanedItemAdapter = new ScanedItemAdapter(this, scaneds, (name,address) -> {
             // 物品点击事件
-            BluetoothIntentService.connect(this, address);
+            BleIntentService.connect(this, address);
             back(name, address);
         });
         binding.scanList.setAdapter(scanedItemAdapter);
@@ -115,6 +107,7 @@ public class ScanActivity extends AppCompatActivity {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (!bluetoothAdapter.isEnabled()) {
             model.getBtStateData().setValue(false);
+            // TODO: 2021/5/8
             new Thread(() -> bluetoothAdapter.enable()).start();
         }else {
             model.getBtStateData().setValue(true);
@@ -142,8 +135,8 @@ public class ScanActivity extends AppCompatActivity {
 
     private void back(String name, String address){
         Intent intent = new Intent();
-        intent.putExtra(BluetoothIntentService.EXTRA_NAME, name);
-        intent.putExtra(BluetoothIntentService.EXTRA_ADDRESS, address);
+        intent.putExtra(BleIntentService.EXTRA_NAME, name);
+        intent.putExtra(BleIntentService.EXTRA_ADDRESS, address);
         setResult(Activity.RESULT_OK, intent);
         this.finishAfterTransition();
     }

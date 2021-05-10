@@ -21,11 +21,11 @@
 
         <ImageView
             android:id="@+id/device_state"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
             android:layout_marginStart="6dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/device_name"
+            app:layout_constraintTop_toTopOf="@id/device_name"
             app:layout_constraintBottom_toBottomOf="@+id/device_name"
             android:src="@{dot}"
             android:contentDescription="@string/state" />

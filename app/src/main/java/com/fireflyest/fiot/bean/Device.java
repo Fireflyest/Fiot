@@ -27,15 +27,18 @@ public class Device implements Parcelable, Cloneable {
 
     private boolean connect;
 
+    private boolean auto;
+
     private int type;
 
-    public Device(long id, String name, String address, boolean display, int type, long create) {
+    public Device(long id, String name, String address, boolean display, int type, long create, boolean auto) {
         this.id = id;
         this.name = name;
         this.address = address;
         this.display = display;
         this.type = type;
         this.create = create;
+        this.auto = auto;
     }
 
     public Device() {
@@ -121,6 +124,14 @@ public class Device implements Parcelable, Cloneable {
         this.type = type;
     }
 
+    public boolean isAuto() {
+        return auto;
+    }
+
+    public void setAuto(boolean auto) {
+        this.auto = auto;
+    }
+
     @Override
     public String toString() {
         return "Device{" +
@@ -133,6 +144,7 @@ public class Device implements Parcelable, Cloneable {
                 ", create=" + create +
                 ", display=" + display +
                 ", connect=" + connect +
+                ", auto=" + auto +
                 ", type=" + type +
                 '}';
     }
@@ -152,21 +164,27 @@ public class Device implements Parcelable, Cloneable {
         if (id != device.id) return false;
         if (create != device.create) return false;
         if (display != device.display) return false;
-        if (connect != device.connect) return false;
-        return type == device.type;
+        if (type != device.type) return false;
+        if (auto != device.auto) return false;
+        if (!nickname.equals(device.nickname)) return false;
+        if (!Objects.equals(name, device.name)) return false;
+        if (!Objects.equals(address, device.address)) return false;
+        if (!Objects.equals(service, device.service)) return false;
+        return Objects.equals(characteristic, device.characteristic);
     }
 
     @Override
     public int hashCode() {
         int result = (int) (id ^ (id >>> 32));
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (nickname != null ? nickname.hashCode() : 0);
-        result = 31 * result + (address != null ? address.hashCode() : 0);
-        result = 31 * result + (service != null ? service.hashCode() : 0);
-        result = 31 * result + (characteristic != null ? characteristic.hashCode() : 0);
+        result = 31 * result + name.hashCode();
+        result = 31 * result + nickname.hashCode();
+        result = 31 * result + address.hashCode();
+        result = 31 * result + service.hashCode();
+        result = 31 * result + characteristic.hashCode();
         result = 31 * result + (int) (create ^ (create >>> 32));
         result = 31 * result + (display ? 1 : 0);
         result = 31 * result + (connect ? 1 : 0);
+        result = 31 * result + (auto ? 1 : 0);
         result = 31 * result + type;
         return result;
     }
@@ -187,6 +205,7 @@ public class Device implements Parcelable, Cloneable {
         dest.writeLong(create);
         dest.writeInt(display ? 1 : 0);
         dest.writeInt(connect ? 1 : 0);
+        dest.writeInt(auto ? 1 : 0);
         dest.writeInt(type);
     }
 
@@ -200,6 +219,7 @@ public class Device implements Parcelable, Cloneable {
         create = in.readLong();
         display = in.readInt() == 1;
         connect = in.readInt() == 1;
+        auto = in.readInt() == 1;
         type = in.readInt();
     }
 

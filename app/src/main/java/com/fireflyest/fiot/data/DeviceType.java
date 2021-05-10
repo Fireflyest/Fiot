@@ -2,9 +2,6 @@ package com.fireflyest.fiot.data;
 
 public class DeviceType {
 
-    private DeviceType(){
-    }
-
     // 已连接，临时保存
     public static final int NON = 0x00;
 

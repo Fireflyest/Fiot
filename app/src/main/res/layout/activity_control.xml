@@ -9,7 +9,7 @@
             name="device_name"
             type="String" />
         <variable
-            name="device_characteristic"
+            name="subtitle"
             type="String" />
     </data>
 
@@ -51,7 +51,7 @@
                     android:layout_height="wrap_content"
                     android:theme="@style/text_small"
                     android:layout_gravity="start"
-                    android:text="@{device_characteristic}"/>
+                    android:text="@{subtitle}"/>
 
             </LinearLayout>
 

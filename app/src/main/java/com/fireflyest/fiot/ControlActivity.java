@@ -1,10 +1,11 @@
 package com.fireflyest.fiot;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
@@ -17,18 +18,19 @@ import android.view.MenuItem;
 import com.fireflyest.fiot.bean.Device;
 import com.fireflyest.fiot.data.DeviceType;
 import com.fireflyest.fiot.databinding.ActivityControlBinding;
-import com.fireflyest.fiot.model.ConfigViewModel;
 import com.fireflyest.fiot.model.ControlViewModel;
-import com.fireflyest.fiot.service.BluetoothIntentService;
+import com.fireflyest.fiot.service.BleIntentService;
 import com.fireflyest.fiot.ui.ControlNormalFragment;
 import com.fireflyest.fiot.util.StatusBarUtil;
 
-public class ControlActivity extends AppCompatActivity {
+public class ControlActivity extends BaseActivity {
 
     public static final String TAG = "ControlActivity";
 
     public static final String EXTRA_DEVICE = // 设备
             "com.fireflyest.fiot.activity.extra.DEVICE";
+
+    public static final int REQUEST_CONFIG = 1;
 
     private ActivityControlBinding binding;
 
@@ -47,9 +49,12 @@ public class ControlActivity extends AppCompatActivity {
 
         // 注册广播监听
         receiver = model.getReceiver();
-        registerReceiver(receiver, new IntentFilter(BluetoothIntentService.ACTION_DATA_AVAILABLE));
-        registerReceiver(receiver, new IntentFilter(BluetoothIntentService.ACTION_GATT_CONNECTED));
-        registerReceiver(receiver, new IntentFilter(BluetoothIntentService.ACTION_GATT_CONNECT_LOSE));
+        super.registerBroadcastReceiver(receiver,
+                new IntentFilter(BleIntentService.ACTION_DATA_AVAILABLE),
+                new IntentFilter(BleIntentService.ACTION_GATT_CONNECTED),
+                new IntentFilter(BleIntentService.ACTION_GATT_CONNECT_LOSE),
+                new IntentFilter(BleIntentService.ACTION_GATT_CHARACTERISTIC_WRITE_SUCCEED),
+                new IntentFilter(BleIntentService.ACTION_GATT_CHARACTERISTIC_WRITE_FAIL));
 
     }
 
@@ -60,14 +65,16 @@ public class ControlActivity extends AppCompatActivity {
         setSupportActionBar(binding.controlToolbar);
         binding.controlToolbar.setNavigationOnClickListener(v -> finishAfterTransition());
 
+        // 更新设备数据
         model.getDeviceData().observe(this, device -> {
             Log.d(TAG, device.toString());
             binding.setDeviceName(device.getName());
             if (device.getCharacteristic() != null) {
-                binding.setDeviceCharacteristic(device.getCharacteristic().substring(0, 8));
+                binding.setSubtitle(device.getCharacteristic().substring(0, 8));
             }else {
-                binding.setDeviceCharacteristic("00000000");
+                binding.setSubtitle("00000000");
             }
+            // 根据设备类型切换布局
             switch (device.getType()){
                 case DeviceType.NON:
                 case DeviceType.LOCAL:
@@ -94,13 +101,27 @@ public class ControlActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (data == null) return;
+        switch (requestCode) {
+            case REQUEST_CONFIG:
+                if (resultCode != Activity.RESULT_OK) return;
+                Device device = data.getParcelableExtra(EXTRA_DEVICE);
+                model.getDeviceData().setValue(device);
+                break;
+            default:
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home){
             finishAfterTransition();
         }else if(item.getItemId() == R.id.menu_config){
             Intent intent = new Intent(this, ConfigActivity.class);
             intent.putExtra(EXTRA_DEVICE, model.getDeviceData().getValue());
-            this.startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+            this.startActivityForResult(intent, REQUEST_CONFIG, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
         }
         return super.onOptionsItemSelected(item);
     }
@@ -113,7 +134,7 @@ public class ControlActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        this.unregisterReceiver(receiver);
+        model.getCommands().clear();
         super.onDestroy();
     }
 

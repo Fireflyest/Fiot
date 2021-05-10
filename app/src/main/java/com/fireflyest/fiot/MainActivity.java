@@ -1,7 +1,6 @@
 package com.fireflyest.fiot;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -15,17 +14,16 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 
 import com.fireflyest.fiot.adapter.ViewPagerAdapter;
 import com.fireflyest.fiot.bean.Device;
 import com.fireflyest.fiot.data.DeviceType;
 import com.fireflyest.fiot.databinding.ActivityMainBinding;
 import com.fireflyest.fiot.model.MainViewModel;
-import com.fireflyest.fiot.service.BluetoothIntentService;
+import com.fireflyest.fiot.service.BleIntentService;
 import com.fireflyest.fiot.ui.DeviceFragment;
 import com.fireflyest.fiot.ui.MineFragment;
+import com.fireflyest.fiot.util.AnimationUtils;
 import com.fireflyest.fiot.util.CalendarUtil;
 import com.fireflyest.fiot.util.StatusBarUtil;
 import com.fireflyest.fiot.util.ToastUtil;
@@ -33,7 +31,7 @@ import com.fireflyest.fiot.util.ToastUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     private static final int REQUEST_BLUETOOTH = 1;
     public static final String TAG = MainActivity.class.getSimpleName();
@@ -55,9 +53,10 @@ public class MainActivity extends AppCompatActivity {
 
         // 注册广播监听
         receiver = model.getReceiver();
-        registerReceiver(receiver, new IntentFilter(BluetoothIntentService.ACTION_DATA_AVAILABLE));
-        registerReceiver(receiver, new IntentFilter(BluetoothIntentService.ACTION_GATT_CONNECTED));
-        registerReceiver(receiver, new IntentFilter(BluetoothIntentService.ACTION_GATT_CONNECT_LOSE));
+        super.registerBroadcastReceiver(receiver,
+                new IntentFilter(BleIntentService.ACTION_DATA_AVAILABLE),
+                new IntentFilter(BleIntentService.ACTION_GATT_CONNECTED),
+                new IntentFilter(BleIntentService.ACTION_GATT_CONNECT_LOSE));
 
         model.initData();
     }
@@ -138,9 +137,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Animation clickAnimation = AnimationUtils.loadAnimation(this, R.anim.item_down);
         binding.mainFloat.setOnClickListener(v -> {
-            v.startAnimation(clickAnimation);
+            AnimationUtils.down(v);
             Intent intent = new Intent(this, ScanActivity.class);
             this.startActivityForResult(intent, REQUEST_BLUETOOTH, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
         });
@@ -153,15 +151,15 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case REQUEST_BLUETOOTH:
                 if (resultCode != Activity.RESULT_OK) return;
-                    name = data.getStringExtra(BluetoothIntentService.EXTRA_NAME);
-                    address = data.getStringExtra(BluetoothIntentService.EXTRA_ADDRESS);
+                    name = data.getStringExtra(BleIntentService.EXTRA_NAME);
+                    address = data.getStringExtra(BleIntentService.EXTRA_ADDRESS);
                     if(null == name) break;
                     Log.d(TAG, "exist? -> " + (model.getDeviceIndex(address) != -1));
                     if(model.getDeviceIndex(address) != -1) {
                         ToastUtil.showShort(this, "设备已存在");
                         break;
                     }
-                    model.getDeviceData().setValue(new Device(0, name, address, true, DeviceType.NON, CalendarUtil.getDate()));
+                    model.getDeviceData().setValue(new Device(0, name, address, true, DeviceType.NON, CalendarUtil.getDate(), false));
                 break;
             default:
         }
@@ -170,7 +168,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        this.unregisterReceiver(receiver);
         model.getDevices().clear();
         super.onDestroy();
     }
