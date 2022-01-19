@@ -56,13 +56,15 @@
                         android:contentDescription="@string/avator" />
 
                     <TextView
+                        android:id="@+id/mine_username"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:layout_constraintStart_toStartOf="@+id/mine_avator"
                         app:layout_constraintTop_toBottomOf="@+id/mine_avator"
                         android:layout_marginTop="16dp"
                         android:text="@{account.name}"
-                        android:textStyle="bold"/>
+                        android:textColor="?attr/itemTextColor"
+                        android:theme="@style/text_bold"/>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

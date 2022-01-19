@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import androidx.core.content.ContextCompat;
 
@@ -21,7 +22,7 @@ public class IconEditText extends androidx.appcompat.widget.AppCompatEditText {
     private Drawable eyeIcon;
     private Drawable emptyIcon;
 
-    private String iconName;
+    private String iconName = "";
 
     public IconEditText(Context context) {
         super(context);
@@ -38,16 +39,16 @@ public class IconEditText extends androidx.appcompat.widget.AppCompatEditText {
     }
 
     private void init(Context context, AttributeSet attrs){
-//        imgInable = ContextCompat.getDrawable(context, R.drawable.ic_account);
-//        accountIcon = ContextCompat.getDrawable(context, R.drawable.ic_account);
-//        passwordIcon = ContextCompat.getDrawable(context, R.drawable.ic_password);
-//        emptyIcon = ContextCompat.getDrawable(context, R.drawable.ic_empty);
-//        eyeIcon = ContextCompat.getDrawable(context, R.drawable.ic_eye);
+        imgInable = ContextCompat.getDrawable(context, R.drawable.ic_account);
+        accountIcon = ContextCompat.getDrawable(context, R.drawable.ic_account);
+        passwordIcon = ContextCompat.getDrawable(context, R.drawable.ic_password);
+        emptyIcon = ContextCompat.getDrawable(context, R.drawable.ic_empty);
+        eyeIcon = ContextCompat.getDrawable(context, R.drawable.ic_eye);
         searchIcon = ContextCompat.getDrawable(context, R.drawable.ic_search);
 
-//        TypedArray typedArray = context.getTheme().obtainStyledAttributes(attrs, R.styleable.Icon, 0, 0);
-//        iconName = typedArray.getString(R.styleable.Icon_iconName);
-//        typedArray.recycle();
+        TypedArray typedArray = context.getTheme().obtainStyledAttributes(attrs, R.styleable.Icon, 0, 0);
+        iconName = typedArray.getString(R.styleable.Icon_iconName);
+        typedArray.recycle();
 
 
         addTextChangedListener(new TextWatcher() {
@@ -74,20 +75,22 @@ public class IconEditText extends androidx.appcompat.widget.AppCompatEditText {
 
     // 设置删除图片
     private void setLeftIcon() {
-//        switch (iconName){
-//            case "account":
-//                setCompoundDrawablesWithIntrinsicBounds(accountIcon, null, emptyIcon, null);
-//                break;
-//            case "password":
-//                setCompoundDrawablesWithIntrinsicBounds(passwordIcon, null, emptyIcon, null);
-//                break;
-//            case "search":
-//                setCompoundDrawablesWithIntrinsicBounds(searchIcon, null, emptyIcon, null);
-//                break;
-//            default:
-//        }
-        setCompoundDrawablesWithIntrinsicBounds(searchIcon, null, emptyIcon, null);
-
+        if (iconName == null) {
+            return;
+        }
+        switch (iconName){
+            case "account":
+                setCompoundDrawablesWithIntrinsicBounds(accountIcon, null, emptyIcon, null);
+                break;
+            case "password":
+                setCompoundDrawablesWithIntrinsicBounds(passwordIcon, null, emptyIcon, null);
+                break;
+            case "search":
+                setCompoundDrawablesWithIntrinsicBounds(searchIcon, null, emptyIcon, null);
+                break;
+            default:
+                setCompoundDrawablesWithIntrinsicBounds(emptyIcon, null, emptyIcon, null);
+        }
     }
 
 }

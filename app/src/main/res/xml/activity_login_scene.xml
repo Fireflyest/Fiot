@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ConstraintSet android:id="@+id/login">
+        <Constraint
+            android:id="@+id/login_forget"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="@id/login_password"
+            app:layout_constraintTop_toBottomOf="@+id/login_password"
+            android:layout_marginTop="10dp" />
+        <Constraint
+            android:id="@+id/login_account"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/login_logo"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:autofillHints=""
+            android:inputType="text"
+            android:textAlignment="center"
+            android:background="@drawable/round_background"
+            android:hint="@string/login_account"
+            android:textSize="16sp" />
+        <Constraint
+            android:id="@+id/login_confirm"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/login_password"
+            android:alpha="0"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:autofillHints=""
+            android:inputType="textPassword"
+            android:textAlignment="center"
+            android:layout_marginTop="32dp"
+            android:hint="@string/login_confirm"
+            android:background="@drawable/round_background"
+            android:textSize="16sp"/>
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/register">
+        <Constraint
+            android:id="@id/login_forget"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="@id/login_password"
+            app:layout_constraintTop_toBottomOf="@+id/login_password"
+            android:alpha="0"
+            android:layout_marginTop="10dp" />
+        <Constraint
+            android:id="@+id/login_account"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/login_logo"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:autofillHints=""
+            android:inputType="text"
+            android:textAlignment="center"
+            android:background="@drawable/round_background"
+            android:hint="@string/login_account"
+            android:textSize="16sp" />
+        <Constraint
+            android:id="@+id/login_confirm"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/login_password"
+            android:alpha="1"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:autofillHints=""
+            android:inputType="textPassword"
+            android:textAlignment="center"
+            android:layout_marginTop="22dp"
+            android:hint="@string/login_confirm"
+            android:background="@drawable/round_background"
+            android:textSize="16sp"/>
+    </ConstraintSet>
+
+    <Transition
+        app:duration="200"
+        app:constraintSetStart="@+id/login"
+        app:constraintSetEnd="@id/register"
+        app:motionInterpolator="linear"/>
+</MotionScene>

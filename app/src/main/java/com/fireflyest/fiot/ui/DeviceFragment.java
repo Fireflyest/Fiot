@@ -57,7 +57,6 @@ public class DeviceFragment extends Fragment {
         model.getTemperatureData().observe(this.getViewLifecycleOwner(), temperature -> binding.setTemperature(temperature));
         model.getHumidityData().observe(this.getViewLifecycleOwner(), humidity -> binding.setHumidity(humidity));
         model.getHomeData().observe(this.getViewLifecycleOwner(), home -> binding.setHome(home));
-        model.getOnlineData().observe(this.getViewLifecycleOwner(), online -> binding.setOnline(online));
 
         // 房间更新
         binding.roomSelect.setTextArray("全部", "客厅", "房间");
