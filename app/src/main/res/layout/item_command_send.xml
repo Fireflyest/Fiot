@@ -11,17 +11,18 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="4dp">
+        android:layout_marginVertical="3dp">
 
         <TextView
+            android:id="@+id/msg_background"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxWidth="340dp"
-            android:background="@drawable/round_primary"
+            android:background="@drawable/msg_send_bottom"
             android:textIsSelectable="true"
             android:textColor="?attr/colorOnSurface"
-            android:paddingVertical="6dp"
-            android:paddingHorizontal="16dp"
+            android:paddingVertical="10dp"
+            android:paddingHorizontal="18dp"
             android:layout_marginEnd="12dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

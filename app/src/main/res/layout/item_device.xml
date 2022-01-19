@@ -16,8 +16,15 @@
         android:layout_width="match_parent"
         android:layout_height="120dp"
         android:layout_marginHorizontal="4dp"
-        android:layout_marginVertical="4dp"
-        android:background="@drawable/round_white">
+        android:layout_marginVertical="4dp">
+
+        <ImageView
+            android:id="@+id/device_background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/round_white"
+            android:transitionName="device_background"
+            android:contentDescription="@string/background" />
 
         <ImageView
             android:id="@+id/device_state"
@@ -39,7 +46,6 @@
             android:layout_marginStart="2dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:transitionName="device_name"
             android:textColor="?attr/itemTextColor"
             android:theme="@style/text_bold"
             android:text="@={device.nickname}" />

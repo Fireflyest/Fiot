@@ -72,18 +72,54 @@ public class CommandItemAdapter extends RecyclerView.Adapter<CommandItemAdapter.
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final Command command = commands.get(position);
         int viewType = this.getItemViewType(position);
+        Log.d(TAG, "onBindViewHolder -> " + command.toString());
+        Log.d(TAG, "position -> " + position);
+        // 指令框类型 -1下 0中 1上
+        int locType = 1;
+        if (position > 0){
+            // 获取上一条消息
+            Command pre = commands.get(position-1);
+
+            if (command.getType() != pre.getType()){ // 上一条消息类型不同，为第一个消息
+                locType = 1;
+            }else if (position != commands.size()-1){ // 有下一条消息
+                Command next = commands.get(position + 1);
+                locType = command.getType() == next.getType() ? 0 : -1;
+            }else { // 新消息
+                locType = -1;
+            }
+        }
+        Log.d(TAG, "locType -> " + locType);
+
         switch (viewType){
             default:
             case CommandType.SEND: {
-                ((ItemCommandSendBinding) holder.binding).setCommand(command);
+                ItemCommandSendBinding b = ((ItemCommandSendBinding) holder.binding);
+                b.setCommand(command);
+                if (locType == 1){
+                    b.msgBackground.setBackgroundResource(R.drawable.msg_send_top);
+                }else if (locType == 0){
+                    b.msgBackground.setBackgroundResource(R.drawable.msg_send_center);
+                }else {
+                    b.msgBackground.setBackgroundResource(R.drawable.msg_send_bottom);
+                }
                 break;
             }
             case CommandType.RECEIVE: {
-                ((ItemCommandRecevieBinding) holder.binding).setCommand(command);
+                ItemCommandRecevieBinding b = ((ItemCommandRecevieBinding) holder.binding);
+                b.setCommand(command);
+                if (locType == 1){
+                    b.msgBackground.setBackgroundResource(R.drawable.msg_receive_top);
+                }else if (locType == 0){
+                    b.msgBackground.setBackgroundResource(R.drawable.msg_receive_center);
+                }else {
+                    b.msgBackground.setBackgroundResource(R.drawable.msg_receive_bottom);
+                }
                 break;
             }
             case CommandType.SYSTEM: {
-                ((ItemCommandSystemBinding) holder.binding).setCommand(command);
+                ItemCommandSystemBinding b = ((ItemCommandSystemBinding) holder.binding);
+                b.setCommand(command);
                 break;
             }
         }
@@ -101,6 +137,10 @@ public class CommandItemAdapter extends RecyclerView.Adapter<CommandItemAdapter.
         Log.d(TAG, "addItem -> " + command.toString());
         commands.add(command);
         notifyItemInserted(commands.size() - 1);
+
+        int preIndex = commands.size() - 2;
+        if (preIndex >= 0)notifyItemChanged(preIndex);
+
     }
 
     public void updateItem(int index){

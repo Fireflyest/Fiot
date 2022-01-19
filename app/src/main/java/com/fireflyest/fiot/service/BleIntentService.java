@@ -113,8 +113,8 @@ public class BleIntentService extends IntentService {
 
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-            Log.e(TAG, "读取数据: "+ Arrays.toString(characteristic.getValue()));
-            broadcastDataAction(ACTION_GATT_CHARACTERISTIC_READ, gatt.getDevice().getAddress(), characteristic.getValue());
+            Log.d(TAG, "读取数据: "+ Arrays.toString(characteristic.getValue()));
+            broadcastDataAction(ACTION_DATA_AVAILABLE, gatt.getDevice().getAddress(), characteristic.getValue());
         }
 
         @Override
@@ -181,6 +181,13 @@ public class BleIntentService extends IntentService {
         context.startService(intent);
     }
 
+    /**
+     * 读取某特征的数据
+     * @param context 上下文
+     * @param address 地址
+     * @param service 服务uuid
+     * @param characteristic 特征uuid
+     */
     public static void readCharacteristic(Context context, String address, String service, String characteristic){
         Intent intent = new Intent(context, BleIntentService.class);
         intent.setAction(ACTION_GATT_CHARACTERISTIC_READ);
@@ -296,9 +303,10 @@ public class BleIntentService extends IntentService {
             return;
         }
 
-        if((gattCharacteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_WRITE) == 0){
-            broadcastDataAction(ACTION_GATT_CHARACTERISTIC_WRITE_FAIL, address, data);
-            Log.e(TAG, "特征不支持写入 -> " + address);
+        if ((gattCharacteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) != 0
+                && (gattCharacteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_WRITE) != 0
+                && (gattCharacteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_SIGNED_WRITE) != 0){
+            Log.e(TAG, "特征无法写入 -> " + address);
             return;
         }
 

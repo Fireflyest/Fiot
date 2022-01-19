@@ -1,6 +1,5 @@
 package com.fireflyest.fiot;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
@@ -28,7 +27,7 @@ import com.fireflyest.fiot.util.StatusBarUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ScanActivity extends AppCompatActivity {
+public class ScanActivity extends BaseActivity {
 
     public static final String TAG = ScanActivity.class.getSimpleName();
 

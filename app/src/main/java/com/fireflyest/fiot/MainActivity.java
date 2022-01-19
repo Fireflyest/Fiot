@@ -39,8 +39,6 @@ public class MainActivity extends BaseActivity {
     private ActivityMainBinding binding;
     private MainViewModel model;
 
-    private BroadcastReceiver receiver;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,11 +50,11 @@ public class MainActivity extends BaseActivity {
         this.initView();
 
         // 注册广播监听
-        receiver = model.getReceiver();
+        BroadcastReceiver receiver = model.getReceiver();
         super.registerBroadcastReceiver(receiver,
-                new IntentFilter(BleIntentService.ACTION_DATA_AVAILABLE),
-                new IntentFilter(BleIntentService.ACTION_GATT_CONNECTED),
-                new IntentFilter(BleIntentService.ACTION_GATT_CONNECT_LOSE));
+                BleIntentService.ACTION_DATA_AVAILABLE,
+                BleIntentService.ACTION_GATT_CONNECTED,
+                BleIntentService.ACTION_GATT_CONNECT_LOSE);
 
         model.initData();
     }

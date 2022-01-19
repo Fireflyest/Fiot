@@ -5,7 +5,9 @@
     <string name="mine">我的</string>
     <string name="add">添加</string>
     <string name="blank"> </string>
-    <string name="丨"> 丨 </string>
+    <string name="temperature">℃</string>
+    <string name="humidity">%</string>
+    <string name="online">人在线</string>
     <string name="to"> </string>
     <string name="amount"> 数量 </string>
     <string name="discovery">扫描中</string>
@@ -32,4 +34,5 @@
     <string name="save">保存</string>
     <string name="send">发送</string>
     <string name="wait">…</string>
+    <string name="background">背景</string>
 </resources>

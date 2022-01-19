@@ -31,7 +31,7 @@ public class DeviceItemAdapter extends RecyclerView.Adapter<DeviceItemAdapter.Vi
     public static final String TAG = "DeviceItemAdapter";
 
     public interface OnItemClickListener {
-        void onclick(Device device, TextView name);
+        void onclick(Device device, View background);
     }
     public interface OnItemLongClickListener {
         void onLongClick(Device device);
@@ -73,13 +73,11 @@ public class DeviceItemAdapter extends RecyclerView.Adapter<DeviceItemAdapter.Vi
         }
 
         holder.itemView.setOnClickListener(v -> {
-            if(device.isConnect()){
-                AnimationUtils.down(v);
-            }else {
+            if(! device.isConnect()){
                 AnimationUtils.click(v);
             }
             if (clickListener != null) {
-                clickListener.onclick(device, holder.binding.deviceName);
+                clickListener.onclick(device, holder.binding.deviceBackground);
 
             }
         });

@@ -12,10 +12,12 @@ import java.util.List;
 
 public class BaseActivity extends AppCompatActivity {
 
-    private static final List<BroadcastReceiver>  receivers = new ArrayList<>();
+    private final List<BroadcastReceiver>  receivers = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+
+
         super.onCreate(savedInstanceState);
     }
 
@@ -23,14 +25,18 @@ public class BaseActivity extends AppCompatActivity {
     protected void onDestroy() {
         for (BroadcastReceiver receiver : receivers) {
             this.unregisterReceiver(receiver);
+            this.receivers.remove(receiver);
         }
         super.onDestroy();
     }
 
-    protected void registerBroadcastReceiver(BroadcastReceiver receiver, IntentFilter... filter){
-        for (IntentFilter intentFilter : filter) {
-            registerReceiver(receiver, intentFilter);
+    protected void registerBroadcastReceiver(BroadcastReceiver receiver, String... actions){
+        IntentFilter intentFilter = new IntentFilter();
+        for (String action : actions) {
+            intentFilter.addAction(action);
         }
+        this.registerReceiver(receiver, intentFilter);
+        this.receivers.add(receiver);
     }
 
 }

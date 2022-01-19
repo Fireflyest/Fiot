@@ -99,8 +99,8 @@ public class TextSwitch extends View {
         ValueAnimator leftAnimator = ValueAnimator.ofFloat(leftStart, leftEnd);
         ValueAnimator rightAnimator = ValueAnimator.ofFloat(rightStart, rightEnd);
         if(amount < 0){
-            leftAnimator.setDuration(400);
-            rightAnimator.setDuration(200);
+            leftAnimator.setDuration(300);
+            rightAnimator.setDuration(150);
             leftAnimator.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
@@ -110,8 +110,8 @@ public class TextSwitch extends View {
                 }
             });
         }else {
-            leftAnimator.setDuration(200);
-            rightAnimator.setDuration(400);
+            leftAnimator.setDuration(150);
+            rightAnimator.setDuration(300);
             rightAnimator.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
@@ -245,30 +245,30 @@ public class TextSwitch extends View {
         defaultWidth = DpOrPxUtil.dip2px(context, 60F);
         defaultHeight = DpOrPxUtil.dip2px(context, 50F);
 
-//        TypedArray typedArray = context.getTheme().obtainStyledAttributes(attrs, R.styleable.Bar, 0, 0);
-//
-//        barWidth = typedArray.getDimension(R.styleable.Bar_barWidth, 0);
-//        barLength = typedArray.getDimension(R.styleable.Bar_barLength, 0);
-//        barScroll = typedArray.getBoolean(R.styleable.Bar_barScroll, true);
-//        int barColor = typedArray.getColor(R.styleable.Bar_barColor, Color.parseColor("#88E0E0E0"));
-//
-//        typedArray.recycle();
+        TypedArray typedArray = context.getTheme().obtainStyledAttributes(attrs, R.styleable.Bar, 0, 0);
+
+        barWidth = typedArray.getDimension(R.styleable.Bar_barWidth, 0);
+        barLength = typedArray.getDimension(R.styleable.Bar_barLength, 0);
+        barScroll = typedArray.getBoolean(R.styleable.Bar_barScroll, true);
+        int barColor = typedArray.getColor(R.styleable.Bar_barColor, Color.parseColor("#88E0E0E0"));
+
+        typedArray.recycle();
 
         barPaint.setStyle(Paint.Style.FILL);
         barPaint.setAntiAlias(true);
         barPaint.setStrokeWidth(joinWidth);
-//        barPaint.setColor(barColor);
+        barPaint.setColor(barColor);
 
         textPaint.setStyle(Paint.Style.FILL);
         textPaint.setStrokeWidth(joinWidth);
-        textPaint.setTextSize(38);
+        textPaint.setTextSize(40);
         textPaint.setAntiAlias(true);
         textPaint.setTextAlign(Paint.Align.CENTER);
         textPaint.setColor(Color.GRAY);
 
         selectTextPaint.setStyle(Paint.Style.FILL);
         selectTextPaint.setStrokeWidth(joinWidth);
-        selectTextPaint.setTextSize(40);
+        selectTextPaint.setTextSize(45);
         selectTextPaint.setFakeBoldText(true);
         selectTextPaint.setAntiAlias(true);
         selectTextPaint.setTextAlign(Paint.Align.CENTER);

@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,8 +72,7 @@ public class ControlNormalFragment extends Fragment {
         model.getHexData().observe(getViewLifecycleOwner(), hex -> binding.setHex(hex));
         model.getHexData().setValue(true);
         binding.commandHex.setOnClickListener(v -> {
-            Boolean hex = model.getHexData().getValue();
-            if (hex == null) hex = false;
+            boolean hex = isHex();
             model.getHexData().setValue(!hex);
             AnimationUtils.click(v);
         });
@@ -89,14 +89,13 @@ public class ControlNormalFragment extends Fragment {
                     binding.controlCommandBox.transitionToStart();
                     model.setText("");
                     binding.commandEdit.setError(null);
-                } else {
-                    binding.controlCommandBox.transitionToEnd();
-                    model.setText(text);
-                    Boolean hex = model.getHexData().getValue();
-                    if (hex == null) hex = false;
-                    if (hex && !patten.matcher(text).matches()){
-                        binding.commandEdit.setError("文本非十六进制字符串");
-                    }
+                    return;
+                }
+                binding.controlCommandBox.transitionToEnd();
+                model.setText(text);
+                boolean hex = isHex();
+                if (hex && !patten.matcher(text).matches()){
+                    binding.commandEdit.setError("文本非十六进制字符串");
                 }
             }
         });
@@ -107,11 +106,14 @@ public class ControlNormalFragment extends Fragment {
                 ToastUtil.showShort(getContext(), "未配置蓝牙属性");
                 return;
             }
+            boolean hex = isHex();
+            if (hex && (!patten.matcher(text).matches() || text.length()%2 != 0)){
+                ToastUtil.showShort(getContext(), "输入格式错误");
+                return;
+            }
             // 新建指令
             Command command = new Command(0, device.getAddress(), true, false, CalendarUtil.getDate(), text, CommandType.SEND);
             commandItemAdapter.addItem(command);
-            Boolean hex = model.getHexData().getValue();
-            if (hex == null) hex = false;
             // 发送指令
             BleIntentService.write(getContext(), device.getAddress(), device.getService(), device.getCharacteristic(),  hex ? ConvertUtil.getHexBytes(text) : text.getBytes());
             binding.commandEdit.setText("");
@@ -119,23 +121,34 @@ public class ControlNormalFragment extends Fragment {
         binding.commandMore.setOnClickListener(v -> {
             AnimationUtils.click(v);
             ToastUtil.showShort(getContext(), "more");
+            BleIntentService.readCharacteristic(getContext(), device.getAddress(), device.getService(), device.getCharacteristic());
         });
 
         model.getCommandData().observe(getViewLifecycleOwner(), command -> {
-
+            Log.d(TAG, "指令更新 -> "+ command.toString());
+            int index = model.getCommands().indexOf(command);
+            if (index == -1){
+                commandItemAdapter.addItem(command);
+            }else {
+                commandItemAdapter.updateItem(index);
+            }
         });
 
         commandItemAdapter = new CommandItemAdapter(getContext(), model.getCommands());
         binding.controlCommandList.setAdapter(commandItemAdapter);
 
-        // 发送结果
-        model.getCommandData().observe(getViewLifecycleOwner(), command -> commandItemAdapter.updateItem(model.getCommands().indexOf(command)));
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putParcelable(ControlActivity.EXTRA_DEVICE, device);
         super.onSaveInstanceState(outState);
+    }
+
+    private boolean isHex(){
+        Boolean hex = model.getHexData().getValue();
+        if (hex == null) hex = false;
+        return hex;
     }
 
 

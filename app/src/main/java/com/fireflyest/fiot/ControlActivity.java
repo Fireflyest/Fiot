@@ -36,8 +36,6 @@ public class ControlActivity extends BaseActivity {
 
     private ControlViewModel model;
 
-    private BroadcastReceiver receiver;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,13 +46,13 @@ public class ControlActivity extends BaseActivity {
         this.initView();
 
         // 注册广播监听
-        receiver = model.getReceiver();
+        BroadcastReceiver receiver = model.getReceiver();
         super.registerBroadcastReceiver(receiver,
-                new IntentFilter(BleIntentService.ACTION_DATA_AVAILABLE),
-                new IntentFilter(BleIntentService.ACTION_GATT_CONNECTED),
-                new IntentFilter(BleIntentService.ACTION_GATT_CONNECT_LOSE),
-                new IntentFilter(BleIntentService.ACTION_GATT_CHARACTERISTIC_WRITE_SUCCEED),
-                new IntentFilter(BleIntentService.ACTION_GATT_CHARACTERISTIC_WRITE_FAIL));
+                BleIntentService.ACTION_DATA_AVAILABLE,
+                BleIntentService.ACTION_GATT_CONNECTED,
+                BleIntentService.ACTION_GATT_CONNECT_LOSE,
+                BleIntentService.ACTION_GATT_CHARACTERISTIC_WRITE_SUCCEED,
+                BleIntentService.ACTION_GATT_CHARACTERISTIC_WRITE_FAIL);
 
     }
 
@@ -66,31 +64,33 @@ public class ControlActivity extends BaseActivity {
         binding.controlToolbar.setNavigationOnClickListener(v -> finishAfterTransition());
 
         // 更新设备数据
-        model.getDeviceData().observe(this, device -> {
-            Log.d(TAG, device.toString());
-            binding.setDeviceName(device.getName());
-            if (device.getCharacteristic() != null) {
-                binding.setSubtitle(device.getCharacteristic().substring(0, 8));
-            }else {
-                binding.setSubtitle("00000000");
-            }
-            // 根据设备类型切换布局
-            switch (device.getType()){
-                case DeviceType.NON:
-                case DeviceType.LOCAL:
-                case DeviceType.REMOTE:
-                default:
-                    this.getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.control_fragment, new ControlNormalFragment())
-                            .commit();
-                    break;
-                case DeviceType.ENVIRONMENT:
-                    // TODO: 2021/4/30
-
-                    break;
-            }
-        });
+//        model.getDeviceData().observe(this, device -> {
+//            Log.d(TAG, device.toString());
+//            binding.setDeviceName(device.getName());
+//            if (device.getCharacteristic() != null) {
+//                binding.setSubtitle(device.getCharacteristic().substring(0, 8));
+//            }else {
+//                binding.setSubtitle("00000000");
+//            }
+//            // 根据设备类型切换布局
+//            switch (device.getType()){
+//                case DeviceType.NON:
+////                    this.startConfigActivity();
+////                    break;
+//                case DeviceType.LOCAL:
+//                case DeviceType.REMOTE:
+//                default:
+//                    this.getSupportFragmentManager()
+//                            .beginTransaction()
+//                            .replace(R.id.control_fragment, new ControlNormalFragment())
+//                            .commit();
+//                    break;
+//                case DeviceType.ENVIRONMENT:
+//                    // TODO: 2021/4/30
+//
+//                    break;
+//            }
+//        });
 
         Intent intent = getIntent();
         Device d = intent.getParcelableExtra(EXTRA_DEVICE);
@@ -98,6 +98,12 @@ public class ControlActivity extends BaseActivity {
             model.getDeviceData().setValue(d);
         }
 
+    }
+
+    private void startConfigActivity(){
+        Intent intent = new Intent(this, ConfigActivity.class);
+        intent.putExtra(EXTRA_DEVICE, model.getDeviceData().getValue());
+        this.startActivityForResult(intent, REQUEST_CONFIG, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
     }
 
     @Override
@@ -119,9 +125,7 @@ public class ControlActivity extends BaseActivity {
         if (item.getItemId() == android.R.id.home){
             finishAfterTransition();
         }else if(item.getItemId() == R.id.menu_config){
-            Intent intent = new Intent(this, ConfigActivity.class);
-            intent.putExtra(EXTRA_DEVICE, model.getDeviceData().getValue());
-            this.startActivityForResult(intent, REQUEST_CONFIG, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+            this.startConfigActivity();
         }
         return super.onOptionsItemSelected(item);
     }

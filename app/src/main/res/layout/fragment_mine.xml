@@ -5,7 +5,9 @@
     tools:context=".ui.MineFragment">
 
     <data>
-
+        <variable
+            name="account"
+            type="com.fireflyest.fiot.bean.Account" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -34,17 +36,18 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/mine_user"
                     android:layout_width="0dp"
-                    android:layout_height="160dp"
+                    android:layout_height="220dp"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/mine_main"
+                    app:layout_constraintEnd_toStartOf="@+id/mine_home"
                     android:background="@drawable/round_white"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginEnd="6dp">
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="8dp">
 
                     <ImageView
-                        android:layout_width="52dp"
-                        android:layout_height="52dp"
+                        android:id="@+id/mine_avator"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
                         android:src="@drawable/ic_circle"
                         android:layout_marginTop="22dp"
                         android:layout_marginStart="16dp"
@@ -52,28 +55,39 @@
                         app:layout_constraintTop_toTopOf="parent"
                         android:contentDescription="@string/avator" />
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="@+id/mine_avator"
+                        app:layout_constraintTop_toBottomOf="@+id/mine_avator"
+                        android:layout_marginTop="16dp"
+                        android:text="@{account.name}"
+                        android:textStyle="bold"/>
+
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <LinearLayout
-                    android:id="@+id/mine_main"
-                    android:layout_width="100dp"
-                    android:layout_height="54dp"
+                    android:id="@+id/mine_home"
+                    android:layout_width="200dp"
+                    android:layout_height="0dp"
                     android:background="@drawable/round_white"
-                    android:layout_marginEnd="12dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="8dp"
                     app:layout_constraintTop_toTopOf="@+id/mine_user"
                     app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/mine_device"
                     android:orientation="horizontal">
 
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/mine_device"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
+                    android:layout_width="0dp"
+                    android:layout_height="90dp"
                     android:background="@drawable/round_white"
-                    android:layout_marginEnd="12dp"
+                    app:layout_constraintStart_toStartOf="@+id/mine_home"
                     app:layout_constraintBottom_toBottomOf="@+id/mine_user"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/mine_home"
                     android:orientation="horizontal">
 
                 </LinearLayout>

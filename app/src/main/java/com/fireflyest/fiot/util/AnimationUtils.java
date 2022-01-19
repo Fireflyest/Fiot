@@ -21,7 +21,7 @@ public class AnimationUtils {
                 .setInterpolator(decelerateInterpolator)
                 .scaleY(0.94F)
                 .scaleX(0.94F)
-                .setDuration(180)
+                .setDuration(120)
                 .setListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationCancel(Animator animation) {
@@ -35,7 +35,7 @@ public class AnimationUtils {
                                 .setInterpolator(decelerateInterpolator)
                                 .scaleX(1.02F)
                                 .scaleY(1.02F)
-                                .setDuration(100)
+                                .setDuration(140)
                                 .setListener(new AnimatorListenerAdapter() {
                                     @Override
                                     public void onAnimationCancel(Animator animation) {

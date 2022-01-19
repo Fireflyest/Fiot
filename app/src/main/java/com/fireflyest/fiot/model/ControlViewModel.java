@@ -47,7 +47,16 @@ public class ControlViewModel extends ViewModel {
 
                     break;
                 case BleIntentService.ACTION_DATA_AVAILABLE:
-
+                    {
+                        byte[] bytesData = intent.getByteArrayExtra(BleIntentService.EXTRA_DATA);
+                        String data = hex && bytesData != null  ? ConvertUtil.bytesToHexString(bytesData) :
+                                new String(bytesData);
+                        commandData.setValue(new Command(0,
+                                deviceData.getValue().getAddress(),
+                                false,
+                                true, CalendarUtil.getDate(),
+                                data, CommandType.RECEIVE));
+                    }
                     break;
                 case BleIntentService.ACTION_GATT_CHARACTERISTIC_WRITE_SUCCEED:
                 case BleIntentService.ACTION_GATT_CHARACTERISTIC_WRITE_FAIL:
@@ -57,8 +66,10 @@ public class ControlViewModel extends ViewModel {
                         byte[] bytesData = intent.getByteArrayExtra(BleIntentService.EXTRA_DATA);
                         String data = hex && bytesData != null  ? ConvertUtil.bytesToHexString(bytesData) :
                                 new String(bytesData);
+                        Log.d(TAG, "更新指令 -> " + data);
                         Command command = getCommand(data);
                         if (command == null) return;
+                        command.setSending(false);
                         command.setSuccess(success);
                         commandData.setValue(command);
                         break;
@@ -101,7 +112,7 @@ public class ControlViewModel extends ViewModel {
 
     public Command getCommand(String data){
         for (Command command : commands) {
-            if (!command.getText().equals(data)) continue;
+            if (!command.getText().equalsIgnoreCase(data) || !command.isSending()) continue;
             return command;
         }
         return null;

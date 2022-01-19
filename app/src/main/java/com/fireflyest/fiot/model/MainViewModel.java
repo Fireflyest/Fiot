@@ -16,9 +16,10 @@ import java.util.List;
 public class MainViewModel extends ViewModel {
 
     // toolbar标题
-    private final MutableLiveData<String> bluetoothStateData = new MutableLiveData<>();
-    private final MutableLiveData<String> netStateData = new MutableLiveData<>();
-    private final MutableLiveData<String> serverData = new MutableLiveData<>();
+    private final MutableLiveData<String> temperatureData = new MutableLiveData<>();
+    private final MutableLiveData<String> humidityData = new MutableLiveData<>();
+    private final MutableLiveData<String> homeData = new MutableLiveData<>();
+    private final MutableLiveData<String> onlineData = new MutableLiveData<>();
 
     // 更新的设备
     private final MutableLiveData<Device> deviceData = new MutableLiveData<>();
@@ -26,6 +27,7 @@ public class MainViewModel extends ViewModel {
     // 设备列表
     private final List<Device> devices = new ArrayList<>();
 
+    // 蓝牙状态广播
     private final BroadcastReceiver receiver =new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -60,16 +62,20 @@ public class MainViewModel extends ViewModel {
         super.onCleared();
     }
 
-    public MutableLiveData<String> getBluetoothStateData() {
-        return bluetoothStateData;
+    public MutableLiveData<String> getTemperatureData() {
+        return temperatureData;
     }
 
-    public MutableLiveData<String> getNetStateData() {
-        return netStateData;
+    public MutableLiveData<String> getHumidityData() {
+        return humidityData;
     }
 
-    public MutableLiveData<String> getServerData() {
-        return serverData;
+    public MutableLiveData<String> getHomeData() {
+        return homeData;
+    }
+
+    public MutableLiveData<String> getOnlineData() {
+        return onlineData;
     }
 
     public MutableLiveData<Device> getDeviceData() {
@@ -96,9 +102,10 @@ public class MainViewModel extends ViewModel {
     }
 
     public void initData(){
-        bluetoothStateData.setValue("蓝牙未开启");
-        netStateData.setValue("网络未连接");
-        serverData.setValue("未配置服务器");
+        temperatureData.setValue("X");
+        humidityData.setValue("X");
+        homeData.setValue("我的家");
+        onlineData.setValue("1");
     }
 
 }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="Bar">
+        <attr name="barWidth" format="dimension" />
+        <attr name="barLength" format="dimension" />
+        <attr name="barColor" format="color" />
+        <attr name="barScroll" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="Icon">
+        <attr name="iconName" format="string" />
+    </declare-styleable>
+</resources>
