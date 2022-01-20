@@ -3,26 +3,19 @@ package com.fireflyest.fiot.model;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.fireflyest.fiot.bean.Account;
 import com.fireflyest.fiot.bean.Device;
+import com.fireflyest.fiot.bean.Home;
+import com.fireflyest.fiot.net.AccountHttpRunnable;
 import com.fireflyest.fiot.service.BleIntentService;
 import com.fireflyest.fiot.util.RSAUtils;
-import com.google.gson.Gson;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import okhttp3.HttpUrl;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
 
 public class MainViewModel extends ViewModel {
 
@@ -31,13 +24,14 @@ public class MainViewModel extends ViewModel {
     // toolbar标题
     private final MutableLiveData<String> temperatureData = new MutableLiveData<>();
     private final MutableLiveData<String> humidityData = new MutableLiveData<>();
-    private final MutableLiveData<String> homeData = new MutableLiveData<>();
+    private final MutableLiveData<Home> homeData = new MutableLiveData<>();
+    private final MutableLiveData<List<Home>> homesData = new MutableLiveData<>();
 
     // 更新的设备
     private final MutableLiveData<Device> deviceData = new MutableLiveData<>();
 
     // 账户
-    private final MutableLiveData<Account> dataAccount = new MutableLiveData<>();
+    private final MutableLiveData<Account> accountData = new MutableLiveData<>();
 
     // 设备列表
     private final List<Device> devices = new ArrayList<>();
@@ -85,16 +79,20 @@ public class MainViewModel extends ViewModel {
         return humidityData;
     }
 
-    public MutableLiveData<String> getHomeData() {
+    public MutableLiveData<Home> getHomeData() {
         return homeData;
+    }
+
+    public MutableLiveData<List<Home>> getHomesData() {
+        return homesData;
     }
 
     public MutableLiveData<Device> getDeviceData() {
         return deviceData;
     }
 
-    public MutableLiveData<Account> getDataAccount() {
-        return dataAccount;
+    public MutableLiveData<Account> getAccountData() {
+        return accountData;
     }
 
     public List<Device> getDevices() {
@@ -118,51 +116,22 @@ public class MainViewModel extends ViewModel {
 
     // 由账户id获取账户
     public void updateAccount(long account, String token){
-        new Thread( new HttpRunnable(account, RSAUtils.publicEncrypt(token, RSAUtils.PUBLIC_KEY) , dataAccount)).start();
+        new Thread( new AccountHttpRunnable(account, RSAUtils.publicEncrypt(token, RSAUtils.PUBLIC_KEY) , accountData)).start();
     }
 
     public void initData(){
         temperatureData.setValue("X");
         humidityData.setValue("X");
-        homeData.setValue("我的家");
+
+        Home h = new Home();
+        h.setName("我的家");
+        homeData.setValue(h);
+
+        homesData.setValue(new ArrayList<>());
+
+        Account a = new Account();
+        a.setName("点击头像登录");
+        accountData.setValue(a);
     }
-
-    static class HttpRunnable implements Runnable {
-
-        private final long account;
-        private final String token;
-        private final MutableLiveData<Account> data;
-
-        public HttpRunnable(long account, String token, MutableLiveData<Account> data) {
-            this.account = account;
-            this.token = token;
-            this.data = data;
-        }
-
-        @Override
-        public void run() {
-            OkHttpClient client = new OkHttpClient.Builder()
-                    .build();
-//        HttpUrl url = HttpUrl.get("http://www.ft0825.top/account")
-            HttpUrl url = HttpUrl.get("http://192.168.2.115:8080/account")
-                    .newBuilder()
-                    .addQueryParameter("account", String.valueOf(account))
-                    .addQueryParameter("token", token)
-                    .build();
-            Request request = new Request.Builder()
-                    .url(url)
-                    .build();
-            try {
-                Response response = client.newCall(request).execute();
-                ResponseBody body = response.body();
-                if (body == null) return;
-                Account account = new Gson().fromJson(body.string(), Account.class);
-                if (account != null) data.postValue(account);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
 
 }

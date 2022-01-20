@@ -7,7 +7,10 @@
     <string name="blank"> </string>
     <string name="temperature">℃</string>
     <string name="humidity">%</string>
-    <string name="online">人在线</string>
+    <string name="id">ID: </string>
+    <string name="device_manager">设备管理</string>
+    <string name="home_manager">家庭管理</string>
+    <string name="scene_manager">场景管理</string>
     <string name="to"> </string>
     <string name="amount"> 数量 </string>
     <string name="discovery">扫描中</string>

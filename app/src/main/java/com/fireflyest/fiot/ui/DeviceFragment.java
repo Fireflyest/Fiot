@@ -23,6 +23,7 @@ import com.fireflyest.fiot.anim.DeviceItemAnimator;
 import com.fireflyest.fiot.databinding.FragmentDeviceBinding;
 import com.fireflyest.fiot.model.MainViewModel;
 import com.fireflyest.fiot.service.BleIntentService;
+import com.fireflyest.fiot.util.ToastUtil;
 
 public class DeviceFragment extends Fragment {
 
@@ -74,6 +75,11 @@ public class DeviceFragment extends Fragment {
             binding.deviceSearch.setTranslationY(offset/scrollRange*200F);
 
             binding.roomSelect.setAlpha(0-offset/scrollRange*1.5F);
+        });
+
+        //  家庭管理
+        binding.homeMore.setOnClickListener(v -> {
+
         });
 
         // 设备列表

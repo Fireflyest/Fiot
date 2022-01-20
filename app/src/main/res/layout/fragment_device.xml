@@ -13,7 +13,7 @@
             type="String" />
         <variable
             name="home"
-            type="String" />
+            type="com.fireflyest.fiot.bean.Home" />
         <variable
             name="online"
             type="String" />
@@ -145,9 +145,18 @@
                     android:id="@+id/device_toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:title="@{home}"
+                    app:title="@{home.name}"
                     app:titleTextAppearance="@style/text_main_title"
-                    app:layout_collapseMode="none" />
+                    app:layout_collapseMode="none" >
+
+                    <ImageView
+                        android:id="@+id/home_more"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_down"
+                        android:contentDescription="@string/home_manager" />
+
+                </androidx.appcompat.widget.Toolbar>
 
             </com.google.android.material.appbar.CollapsingToolbarLayout>
 

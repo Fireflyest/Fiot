@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,12 +19,17 @@ import android.view.ViewGroup;
 
 import com.fireflyest.fiot.LoginActivity;
 import com.fireflyest.fiot.R;
+import com.fireflyest.fiot.bean.Account;
 import com.fireflyest.fiot.databinding.FragmentMineBinding;
 import com.fireflyest.fiot.model.MainViewModel;
+import com.fireflyest.fiot.net.HomeCreateHttpRunnable;
+import com.fireflyest.fiot.net.HomesHttpRunnable;
 import com.fireflyest.fiot.util.PreferencesUtils;
+
 
 public class MineFragment extends Fragment {
 
+    private static final String TAG = "MineFragment";
     private static final int RESULT_LOGIN = 0;
 
     private FragmentMineBinding binding;
@@ -54,16 +60,49 @@ public class MineFragment extends Fragment {
         binding.mineToolbar.setTitle(R.string.mine);
         this.setHasOptionsMenu(true);
 
+        // 头像点击
         binding.mineAvator.setOnClickListener(v -> {
-            if(model.getDataAccount().getValue() == null){
+            Account account = model.getAccountData().getValue();
+            if(account != null && this.getString(R.string.login_default).equals(account.getName())){
                 this.startActivityForResult(new Intent(view.getContext(), LoginActivity.class), RESULT_LOGIN);
             }else {
-//                    this.startActivity(new Intent(view.getContext(), ProfileActivity.class));
+                // todo 已登录状态
+                // this.startActivity(new Intent(view.getContext(), ProfileActivity.class));
             }
         });
 
-        model.getDataAccount().observe(this.getViewLifecycleOwner(), account -> binding.setAccount(account));
+        // 家列表更新
+        model.getHomesData().observe(this.getViewLifecycleOwner(), homes -> {
+            Account account = model.getAccountData().getValue();
+            if (account == null) return;
+            if(homes == null || homes.size() == 0){
+                new Thread(
+                        new HomeCreateHttpRunnable(account.getId(), account.getName() + "的家", model.getHomeData()) ).start();
+            }else {
+                model.getHomeData().setValue(homes.get(0));
+            }
+        });
 
+        // 账户状态监控
+        // todo 登录成功
+        model.getAccountData().observe(this.getViewLifecycleOwner(), account -> {
+            binding.setAccount(account);
+            // 初始化家
+            new Thread(new HomesHttpRunnable(account.getId(), model.getHomesData())).start();
+            // 更新设备列表
+
+        });
+
+        // 初始化账户
+        binding.setDeviceInfo("0个智能设备");
+
+        // 自动登录
+        long account = PreferencesUtils.getLongData("login_account");
+        String token = PreferencesUtils.getStringData("login_token");
+        if(0 != account && token != null){
+            model.updateAccount(account, token);
+            Log.i(TAG, "account = " + account);
+        }
     }
 
     @Override
