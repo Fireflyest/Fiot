@@ -30,12 +30,14 @@
             android:id="@+id/device_appbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
             app:elevation="0dp">
 
             <com.google.android.material.appbar.CollapsingToolbarLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:titleEnabled="false"
+                android:background="@android:color/transparent"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -43,12 +45,13 @@
                     android:layout_height="180dp"
                     app:layout_collapseMode="pin"
                     app:layout_collapseParallaxMultiplier="0.5"
-                    android:background="?attr/backgroundColor">
+                    android:background="@android:color/transparent">
 
                     <ImageView
                         android:id="@+id/main_temperature_icon"
                         android:layout_width="22dp"
                         android:layout_height="22dp"
+                        android:visibility="gone"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         android:layout_marginTop="?attr/actionBarSize"
@@ -60,6 +63,7 @@
                         android:id="@+id/main_temperature_value"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:visibility="gone"
                         app:layout_constraintTop_toTopOf="@+id/main_temperature_icon"
                         app:layout_constraintBottom_toBottomOf="@+id/main_temperature_icon"
                         app:layout_constraintStart_toEndOf="@+id/main_temperature_icon"
@@ -71,6 +75,7 @@
                         android:id="@+id/main_humidity_icon"
                         android:layout_width="22dp"
                         android:layout_height="22dp"
+                        android:visibility="gone"
                         android:layout_marginStart="22dp"
                         app:layout_constraintStart_toEndOf="@+id/main_temperature_value"
                         app:layout_constraintTop_toTopOf="@+id/main_temperature_icon"
@@ -82,6 +87,7 @@
                         android:id="@+id/main_humidity_value"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:visibility="gone"
                         app:layout_constraintTop_toTopOf="@+id/main_humidity_icon"
                         app:layout_constraintBottom_toBottomOf="@+id/main_humidity_icon"
                         app:layout_constraintStart_toEndOf="@+id/main_humidity_icon"
@@ -172,7 +178,6 @@
                 android:id="@+id/device_list"
                 android:layout_width="match_parent"
                 android:layout_height="120dp"
-                android:overScrollMode="never"
                 android:layout_marginHorizontal="6dp"
                 tools:listitem="@layout/item_device"
                 app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"

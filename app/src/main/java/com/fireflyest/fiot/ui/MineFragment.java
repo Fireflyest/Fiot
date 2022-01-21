@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DividerItemDecoration;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,15 +17,22 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.fireflyest.fiot.LoginActivity;
 import com.fireflyest.fiot.R;
+import com.fireflyest.fiot.adapter.LineItemAdapter;
 import com.fireflyest.fiot.bean.Account;
+import com.fireflyest.fiot.bean.Line;
 import com.fireflyest.fiot.databinding.FragmentMineBinding;
 import com.fireflyest.fiot.model.MainViewModel;
 import com.fireflyest.fiot.net.HomeCreateHttpRunnable;
 import com.fireflyest.fiot.net.HomesHttpRunnable;
 import com.fireflyest.fiot.util.PreferencesUtils;
+import com.fireflyest.fiot.util.ToastUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MineFragment extends Fragment {
@@ -59,6 +67,18 @@ public class MineFragment extends Fragment {
         if (activity != null) activity.setSupportActionBar(binding.mineToolbar);
         binding.mineToolbar.setTitle(R.string.mine);
         this.setHasOptionsMenu(true);
+
+        // 导航列表
+        List<Line> lines = new ArrayList<>();
+        lines.add(new Line("光线", 0));
+        lines.add(new Line("安防", 0));
+        lines.add(new Line("音视", 0));
+        lines.add(new Line("环境", 0));
+        LineItemAdapter lineItemAdapter = new LineItemAdapter(view.getContext(), lines);
+        lineItemAdapter.setClickListener(line -> {
+            ToastUtil.showShort(getContext(), line.getName());
+        });
+        binding.navigationList.setAdapter(lineItemAdapter);
 
         // 头像点击
         binding.mineAvator.setOnClickListener(v -> {

@@ -10,4 +10,13 @@
     <declare-styleable name="Icon">
         <attr name="iconName" format="string" />
     </declare-styleable>
+
+    <!--模糊-->
+    <declare-styleable name="BlurringView">
+        <attr name="blurRadius" format="integer"/>
+        <attr name="downSampleFactor" format="integer"/>
+        <attr name="overlayColor" format="color"/>
+    </declare-styleable>
+
+
 </resources>

@@ -61,6 +61,7 @@ public class DeviceFragment extends Fragment {
 
         // 房间更新
         binding.roomSelect.setTextArray("全部", "客厅", "房间");
+        // 环境
 
         // toolbar动画
         binding.deviceAppbar.addOnOffsetChangedListener((v,offset) ->{
@@ -73,6 +74,7 @@ public class DeviceFragment extends Fragment {
             binding.mainHumidityValue.setAlpha(1+offset/scrollRange*1.5F);
 
             binding.deviceSearch.setTranslationY(offset/scrollRange*200F);
+            binding.deviceSearch.setAlpha(1+offset/scrollRange);
 
             binding.roomSelect.setAlpha(0-offset/scrollRange*1.5F);
         });

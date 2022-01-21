@@ -246,7 +246,6 @@ public class TextSwitch extends View {
         defaultHeight = DpOrPxUtil.dip2px(context, 50F);
 
         TypedArray typedArray = context.getTheme().obtainStyledAttributes(attrs, R.styleable.Bar, 0, 0);
-
         barWidth = typedArray.getDimension(R.styleable.Bar_barWidth, 0);
         barLength = typedArray.getDimension(R.styleable.Bar_barLength, 0);
         barScroll = typedArray.getBoolean(R.styleable.Bar_barScroll, true);
@@ -264,7 +263,7 @@ public class TextSwitch extends View {
         textPaint.setTextSize(40);
         textPaint.setAntiAlias(true);
         textPaint.setTextAlign(Paint.Align.CENTER);
-        textPaint.setColor(Color.GRAY);
+        textPaint.setColor(Color.BLACK);
 
         selectTextPaint.setStyle(Paint.Style.FILL);
         selectTextPaint.setStrokeWidth(joinWidth);

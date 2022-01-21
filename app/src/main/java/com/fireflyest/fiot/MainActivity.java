@@ -1,6 +1,8 @@
 package com.fireflyest.fiot;
 
 import androidx.annotation.Nullable;
+import androidx.databinding.BindingMethod;
+import androidx.databinding.BindingMethods;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -17,13 +19,16 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.EditText;
 
 import com.fireflyest.fiot.adapter.ViewPagerAdapter;
 import com.fireflyest.fiot.bean.Device;
 import com.fireflyest.fiot.data.DeviceType;
 import com.fireflyest.fiot.databinding.ActivityMainBinding;
+import com.fireflyest.fiot.dialog.VagueDialog;
 import com.fireflyest.fiot.model.MainViewModel;
 import com.fireflyest.fiot.service.BleIntentService;
 import com.fireflyest.fiot.ui.DeviceFragment;
@@ -140,11 +145,18 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-        binding.mainFloat.setOnClickListener(v -> {
-            AnimationUtils.down(v);
-            Intent intent = new Intent(this, ScanActivity.class);
-            this.startActivityForResult(intent, REQUEST_BLUETOOTH, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
-        });
+        // 中间按钮
+        binding.mainFloat.setOnClickListener(v ->
+                new VagueDialog(MainActivity.this, R.layout.dialog_main_add)
+                        .setOnItemClickListener(id -> {
+                            if(id == R.id.device_add){
+                                Intent intent = new Intent(this, ScanActivity.class);
+                                this.startActivityForResult(intent, REQUEST_BLUETOOTH, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+                            }else if(id == R.id.command_add){
+
+                            }
+                        })
+                        .show());
     }
 
     @Override
