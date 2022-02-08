@@ -26,6 +26,7 @@ import android.widget.EditText;
 
 import com.fireflyest.fiot.adapter.ViewPagerAdapter;
 import com.fireflyest.fiot.bean.Device;
+import com.fireflyest.fiot.bean.Home;
 import com.fireflyest.fiot.data.DeviceType;
 import com.fireflyest.fiot.databinding.ActivityMainBinding;
 import com.fireflyest.fiot.dialog.VagueDialog;
@@ -43,7 +44,8 @@ import java.util.List;
 
 public class MainActivity extends BaseActivity {
 
-    private static final int REQUEST_BLUETOOTH = 1;
+    public static final int REQUEST_BLUETOOTH = 1;
+    public static final int REQUEST_HOME = 2;
     public static final String TAG = MainActivity.class.getSimpleName();
 
     private ActivityMainBinding binding;
@@ -163,18 +165,24 @@ public class MainActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (data == null) return;
         String name, address;
+        // 请求类型
         switch (requestCode) {
             case REQUEST_BLUETOOTH:
                 if (resultCode != Activity.RESULT_OK) return;
-                    name = data.getStringExtra(BleIntentService.EXTRA_NAME);
-                    address = data.getStringExtra(BleIntentService.EXTRA_ADDRESS);
-                    if(null == name) break;
-                    Log.d(TAG, "exist? -> " + (model.getDeviceIndex(address) != -1));
-                    if(model.getDeviceIndex(address) != -1) {
-                        ToastUtil.showShort(this, "设备已存在");
-                        break;
-                    }
-                    model.getDeviceData().setValue(new Device(0, name, address, true, DeviceType.NON, CalendarUtil.getDate(), false));
+                name = data.getStringExtra(BleIntentService.EXTRA_NAME);
+                address = data.getStringExtra(BleIntentService.EXTRA_ADDRESS);
+                if(null == name) break;
+                Log.d(TAG, "exist? -> " + (model.getDeviceIndex(address) != -1));
+                if(model.getDeviceIndex(address) != -1) {
+                    ToastUtil.showShort(this, "设备已存在");
+                    break;
+                }
+                model.getDeviceData().setValue(new Device(0, name, address, true, DeviceType.NON, CalendarUtil.getDate()));
+                break;
+            case REQUEST_HOME:
+                if (resultCode != Activity.RESULT_OK) return;
+                Home home = data.getParcelableExtra("home");
+                model.getHomeData().setValue(home);
                 break;
             default:
         }

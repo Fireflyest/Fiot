@@ -31,7 +31,7 @@ public class HomesHttpRunnable implements Runnable{
     public void run() {
         OkHttpClient client = new OkHttpClient.Builder()
                 .build();
-//        HttpUrl url = HttpUrl.get("http://www.ft0825.top/account")
+//        HttpUrl url = HttpUrl.get("http://www.ft0825.top/homes")
         HttpUrl url = HttpUrl.get("http://192.168.2.115:8080/homes")
                 .newBuilder()
                 .addQueryParameter("owner", String.valueOf(owner))

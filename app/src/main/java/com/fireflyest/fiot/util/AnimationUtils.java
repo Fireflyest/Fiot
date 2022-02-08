@@ -74,4 +74,22 @@ public class AnimationUtils {
                 });
     }
 
+    public static void alpha(View view, float alpha){
+        view.animate()
+                .setInterpolator(decelerateInterpolator)
+                .alpha(alpha)
+                .setDuration(200)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+                        view.setAlpha(0.7F);
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        view.setAlpha(0.7F);
+                    }
+                });
+    }
+
 }

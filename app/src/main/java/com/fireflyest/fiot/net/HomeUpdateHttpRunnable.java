@@ -17,27 +17,28 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-public class HomeCreateHttpRunnable implements Runnable{
+public class HomeUpdateHttpRunnable implements Runnable{
 
-    private final long owner;
-    private final String name;
-    private final MutableLiveData<Home> home;
+    private final long id;
+    private final String key;
+    private final String value;
 
-    public HomeCreateHttpRunnable(long owner, String name, MutableLiveData<Home> home){
-        this.owner = owner;
-        this.name = name;
-        this.home = home;
+    public HomeUpdateHttpRunnable(long id, String key, String value){
+        this.id = id;
+        this.key = key;
+        this.value = value;
     }
 
     @Override
     public void run() {
         OkHttpClient client = new OkHttpClient.Builder()
                 .build();
-//        HttpUrl url = HttpUrl.get("http://www.ft0825.top/createHome")
-        HttpUrl url = HttpUrl.get("http://192.168.2.115:8080/createHome")
+//        HttpUrl url = HttpUrl.get("http://www.ft0825.top/account")
+        HttpUrl url = HttpUrl.get("http://192.168.2.115:8080/updateHome")
                 .newBuilder()
-                .addQueryParameter("owner", String.valueOf(owner))
-                .addQueryParameter("name", name)
+                .addQueryParameter("id", String.valueOf(id))
+                .addQueryParameter("key", key)
+                .addQueryParameter("value", value)
                 .build();
         Request request = new Request.Builder()
                 .url(url)
@@ -46,8 +47,9 @@ public class HomeCreateHttpRunnable implements Runnable{
             Response response = client.newCall(request).execute();
             ResponseBody body = response.body();
             if (body == null) return;
-            Home h = new Gson().fromJson(body.string(), Home.class);
-            home.postValue(h);
+
+//            Home h = new Gson().fromJson(body.string(), Home.class);
+//            home.postValue(h);
         } catch (IOException e) {
             e.printStackTrace();
         }

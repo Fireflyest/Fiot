@@ -3,42 +3,45 @@ package com.fireflyest.fiot.bean;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import androidx.annotation.NonNull;
-
 import java.util.Objects;
 
 public class Device implements Parcelable, Cloneable {
 
     private long id;
 
+    // 蓝牙名称，用于判断设备类型
     private String name;
 
+    // 设备备注名
     private String nickname;
 
+    // 设备蓝牙地址，用于判断设备是否重复
     private String address;
 
-    private String service;
+    // 所在房间
+    private String room;
 
-    private String characteristic;
+    // 展示简介
+    private String desc;
 
+    // 创建时间
     private long create;
 
+    // 设备是否展示
     private boolean display;
 
+    // 连接状态
     private boolean connect;
-
-    private boolean auto;
 
     private int type;
 
-    public Device(long id, String name, String address, boolean display, int type, long create, boolean auto) {
+    public Device(long id, String name, String address, boolean display, int type, long create) {
         this.id = id;
         this.name = name;
         this.address = address;
         this.display = display;
         this.type = type;
         this.create = create;
-        this.auto = auto;
     }
 
     public Device() {
@@ -84,20 +87,20 @@ public class Device implements Parcelable, Cloneable {
         this.address = address;
     }
 
-    public String getService() {
-        return service;
+    public String getRoom() {
+        return room;
     }
 
-    public void setService(String service) {
-        this.service = service;
+    public void setRoom(String room) {
+        this.room = room;
     }
 
-    public String getCharacteristic() {
-        return characteristic;
+    public String getDesc() {
+        return desc;
     }
 
-    public void setCharacteristic(String characteristic) {
-        this.characteristic = characteristic;
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 
     public boolean isDisplay() {
@@ -124,14 +127,6 @@ public class Device implements Parcelable, Cloneable {
         this.type = type;
     }
 
-    public boolean isAuto() {
-        return auto;
-    }
-
-    public void setAuto(boolean auto) {
-        this.auto = auto;
-    }
-
     @Override
     public String toString() {
         return "Device{" +
@@ -139,12 +134,11 @@ public class Device implements Parcelable, Cloneable {
                 ", name='" + name + '\'' +
                 ", nickname='" + nickname + '\'' +
                 ", address='" + address + '\'' +
-                ", service='" + service + '\'' +
-                ", characteristic='" + characteristic + '\'' +
+                ", room='" + room + '\'' +
+                ", desc='" + desc + '\'' +
                 ", create=" + create +
                 ", display=" + display +
                 ", connect=" + connect +
-                ", auto=" + auto +
                 ", type=" + type +
                 '}';
     }
@@ -165,12 +159,11 @@ public class Device implements Parcelable, Cloneable {
         if (create != device.create) return false;
         if (display != device.display) return false;
         if (type != device.type) return false;
-        if (auto != device.auto) return false;
         if (!nickname.equals(device.nickname)) return false;
         if (!Objects.equals(name, device.name)) return false;
         if (!Objects.equals(address, device.address)) return false;
-        if (!Objects.equals(service, device.service)) return false;
-        return Objects.equals(characteristic, device.characteristic);
+        if (!Objects.equals(room, device.room)) return false;
+        return Objects.equals(desc, device.desc);
     }
 
     @Override
@@ -179,12 +172,11 @@ public class Device implements Parcelable, Cloneable {
         result = 31 * result + name.hashCode();
         result = 31 * result + nickname.hashCode();
         result = 31 * result + address.hashCode();
-        result = 31 * result + service.hashCode();
-        result = 31 * result + characteristic.hashCode();
+        result = 31 * result + room.hashCode();
+        result = 31 * result + desc.hashCode();
         result = 31 * result + (int) (create ^ (create >>> 32));
         result = 31 * result + (display ? 1 : 0);
         result = 31 * result + (connect ? 1 : 0);
-        result = 31 * result + (auto ? 1 : 0);
         result = 31 * result + type;
         return result;
     }
@@ -200,12 +192,11 @@ public class Device implements Parcelable, Cloneable {
         dest.writeString(name);
         dest.writeString(nickname);
         dest.writeString(address);
-        dest.writeString(service);
-        dest.writeString(characteristic);
+        dest.writeString(room);
+        dest.writeString(desc);
         dest.writeLong(create);
         dest.writeInt(display ? 1 : 0);
         dest.writeInt(connect ? 1 : 0);
-        dest.writeInt(auto ? 1 : 0);
         dest.writeInt(type);
     }
 
@@ -214,12 +205,11 @@ public class Device implements Parcelable, Cloneable {
         name = in.readString();
         nickname = in.readString();
         address = in.readString();
-        service = in.readString();
-        characteristic = in.readString();
+        room = in.readString();
+        desc = in.readString();
         create = in.readLong();
         display = in.readInt() == 1;
         connect = in.readInt() == 1;
-        auto = in.readInt() == 1;
         type = in.readInt();
     }
 

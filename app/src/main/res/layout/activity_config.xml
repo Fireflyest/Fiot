@@ -138,7 +138,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:theme="@style/layout_theme"
-                    android:checked="@={device.auto}"
                     app:layout_constraintTop_toTopOf="@+id/config_auto_text"
                     app:layout_constraintBottom_toBottomOf="@+id/config_auto_text"
                     app:layout_constraintEnd_toEndOf="parent" />

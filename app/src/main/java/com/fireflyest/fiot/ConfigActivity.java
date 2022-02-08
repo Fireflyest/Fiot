@@ -7,7 +7,6 @@ import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,7 +14,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.CompoundButton;
 
 import com.fireflyest.fiot.adapter.CharacteristicItemAdapter;
 import com.fireflyest.fiot.adapter.ServiceItemAdapter;
@@ -124,11 +122,11 @@ public class ConfigActivity extends AppCompatActivity {
                     model.selectService(uuid);
 
                     Log.d(TAG, "SelectedService -> " + uuid);
-                    binding.getDevice().setService(uuid);
+                    binding.getDevice().setRoom(uuid);
 
                     // 如果设备有选择特征
-                    if (d.getCharacteristic() != null){
-                        int index = indexOfCharacteristic(d.getCharacteristic());
+                    if (d.getDesc() != null){
+                        int index = indexOfCharacteristic(d.getDesc());
                         Log.d(TAG, "device characteristic index -> " + index);
                         binding.configCharacteristic.setSelection(index);
                     }
@@ -139,8 +137,8 @@ public class ConfigActivity extends AppCompatActivity {
                 }
             });
             // 如果设备有选择服务
-            if (d.getService() != null){
-                int index = indexOfService(d.getService());
+            if (d.getRoom() != null){
+                int index = indexOfService(d.getRoom());
                 Log.d(TAG, "device service index -> " + index);
                 binding.configService.setSelection(index);
             }
@@ -153,7 +151,7 @@ public class ConfigActivity extends AppCompatActivity {
                     String uuid = characteristic.getUuid();
 
                     Log.d(TAG, "SelectedCharacteristic -> " + uuid);
-                    binding.getDevice().setCharacteristic(uuid);
+                    binding.getDevice().setDesc(uuid);
                 }
                 @Override
                 public void onNothingSelected(AdapterView<?> parent) { }
@@ -195,12 +193,11 @@ public class ConfigActivity extends AppCompatActivity {
                 device.getAddress(),
                 device.isDisplay(),
                 device.getType(),
-                device.getCreate(),
-                device.isAuto());
+                device.getCreate());
         rawDevice.setNickname(device.getNickname());
         rawDevice.setConnect(device.isConnect());
-        rawDevice.setService(device.getService());
-        rawDevice.setCharacteristic(device.getCharacteristic());
+        rawDevice.setRoom(device.getRoom());
+        rawDevice.setDesc(device.getDesc());
     }
 
     /**
@@ -242,7 +239,7 @@ public class ConfigActivity extends AppCompatActivity {
         Intent intent = new Intent();
         // 未选择特征
         if (binding.configCharacteristic.getSelectedItemPosition() == 0){
-            binding.getDevice().setCharacteristic(null);
+            binding.getDevice().setDesc(null);
         }
         intent.putExtra(ControlActivity.EXTRA_DEVICE, binding.getDevice());
         this.setResult(Activity.RESULT_OK, intent);

@@ -40,6 +40,8 @@ public class MineFragment extends Fragment {
     private static final String TAG = "MineFragment";
     private static final int RESULT_LOGIN = 0;
 
+    int tryAmount = 0;
+
     private FragmentMineBinding binding;
 
     private MainViewModel model;
@@ -83,6 +85,7 @@ public class MineFragment extends Fragment {
         // 头像点击
         binding.mineAvator.setOnClickListener(v -> {
             Account account = model.getAccountData().getValue();
+            // 判断是否登录
             if(account != null && this.getString(R.string.login_default).equals(account.getName())){
                 this.startActivityForResult(new Intent(view.getContext(), LoginActivity.class), RESULT_LOGIN);
             }else {
@@ -95,9 +98,17 @@ public class MineFragment extends Fragment {
         model.getHomesData().observe(this.getViewLifecycleOwner(), homes -> {
             Account account = model.getAccountData().getValue();
             if (account == null) return;
+            // 判断是否有家
             if(homes == null || homes.size() == 0){
-                new Thread(
-                        new HomeCreateHttpRunnable(account.getId(), account.getName() + "的家", model.getHomeData()) ).start();
+                // 再次尝试获取列表
+                if(tryAmount <= 2){
+                    new Thread(new HomesHttpRunnable(account.getId(), model.getHomesData())).start();
+                }else {
+                    // 新建家
+                    new Thread(
+                            new HomeCreateHttpRunnable(account.getId(), account.getName() + "的家", model.getHomeData()) ).start();
+                }
+                tryAmount ++;
             }else {
                 model.getHomeData().setValue(homes.get(0));
             }
@@ -107,7 +118,7 @@ public class MineFragment extends Fragment {
         // todo 登录成功
         model.getAccountData().observe(this.getViewLifecycleOwner(), account -> {
             binding.setAccount(account);
-            // 初始化家
+            // 初始化家列表
             new Thread(new HomesHttpRunnable(account.getId(), model.getHomesData())).start();
             // 更新设备列表
 

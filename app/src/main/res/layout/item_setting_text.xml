@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="setting"
+            type="com.fireflyest.fiot.bean.Setting" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_width="match_parent"
+        android:layout_height="52dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{setting.name}"
+            android:layout_marginStart="22dp"
+            android:textSize="17sp"
+            android:textColor="?attr/itemTextColor"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:textSize="17sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:text="@{setting.stringValue}"
+            android:gravity="center"
+            app:drawableEndCompat="@drawable/ic_forward_small" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

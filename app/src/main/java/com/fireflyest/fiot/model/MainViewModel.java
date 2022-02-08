@@ -127,8 +127,6 @@ public class MainViewModel extends ViewModel {
         h.setName("我的家");
         homeData.setValue(h);
 
-        homesData.setValue(new ArrayList<>());
-
         Account a = new Account();
         a.setName("点击头像登录");
         accountData.setValue(a);

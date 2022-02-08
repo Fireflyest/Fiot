@@ -102,7 +102,7 @@ public class ControlNormalFragment extends Fragment {
         binding.commandSend.setOnClickListener(v -> {
             AnimationUtils.click(v);
             String text = model.getText();
-            if (TextUtils.isEmpty(device.getService()) || TextUtils.isEmpty(device.getService())){
+            if (TextUtils.isEmpty(device.getRoom()) || TextUtils.isEmpty(device.getRoom())){
                 ToastUtil.showShort(getContext(), "未配置蓝牙属性");
                 return;
             }
@@ -115,13 +115,13 @@ public class ControlNormalFragment extends Fragment {
             Command command = new Command(0, device.getAddress(), true, false, CalendarUtil.getDate(), text, CommandType.SEND);
             commandItemAdapter.addItem(command);
             // 发送指令
-            BleIntentService.write(getContext(), device.getAddress(), device.getService(), device.getCharacteristic(),  hex ? ConvertUtil.getHexBytes(text) : text.getBytes());
+            BleIntentService.write(getContext(), device.getAddress(), device.getRoom(), device.getDesc(),  hex ? ConvertUtil.getHexBytes(text) : text.getBytes());
             binding.commandEdit.setText("");
         });
         binding.commandMore.setOnClickListener(v -> {
             AnimationUtils.click(v);
             ToastUtil.showShort(getContext(), "more");
-            BleIntentService.readCharacteristic(getContext(), device.getAddress(), device.getService(), device.getCharacteristic());
+            BleIntentService.readCharacteristic(getContext(), device.getAddress(), device.getRoom(), device.getDesc());
         });
 
         model.getCommandData().observe(getViewLifecycleOwner(), command -> {

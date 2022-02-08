@@ -32,6 +32,12 @@
         <item name="android:windowSharedElementExitTransition">
             @transition/image_transform_out</item>
 
+        <item name="popupMenuStyle">@style/popMenu_style</item>
+
+    </style>
+
+    <style name="popMenu_style" parent="@android:style/Widget.PopupMenu">
+        <item name="android:background">@drawable/round_white</item>
     </style>
 
     <style name="layout_theme" parent="Theme.AppCompat.Light">

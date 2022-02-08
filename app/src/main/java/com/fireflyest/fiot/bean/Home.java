@@ -1,11 +1,14 @@
 package com.fireflyest.fiot.bean;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * @author Fireflyest
  * 2022/1/19 21:37
  */
 
-public class Home {
+public class Home implements Parcelable {
 
     private long id;
 
@@ -36,6 +39,29 @@ public class Home {
         this.password = password;
         this.rooms = rooms;
     }
+
+    protected Home(Parcel in) {
+        id = in.readLong();
+        owner = in.readLong();
+        name = in.readString();
+        members = in.readString();
+        background = in.readInt();
+        wifi = in.readString();
+        password = in.readString();
+        rooms = in.readString();
+    }
+
+    public static final Creator<Home> CREATOR = new Creator<Home>() {
+        @Override
+        public Home createFromParcel(Parcel in) {
+            return new Home(in);
+        }
+
+        @Override
+        public Home[] newArray(int size) {
+            return new Home[size];
+        }
+    };
 
     public String getMembers() {
         return members;
@@ -100,4 +126,25 @@ public class Home {
     public void setBackground(int background) {
         this.background = background;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(id);
+        dest.writeLong(owner);
+        dest.writeString(name);
+        dest.writeString(members);
+        dest.writeInt(background);
+        dest.writeString(wifi);
+        dest.writeString(password);
+        dest.writeString(rooms);
+    }
+
+
+
+
 }
