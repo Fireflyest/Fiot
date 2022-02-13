@@ -15,13 +15,15 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
+        android:background="?attr/backgroundColor">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/home_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:title=" "
+            android:background="?attr/colorOnSurface"
+            android:fitsSystemWindows="true"
             app:titleTextAppearance="@style/text_title"
             app:layout_constraintTop_toTopOf="parent"
             app:navigationIcon="@drawable/ic_back" />

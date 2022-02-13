@@ -1,13 +1,11 @@
 package com.fireflyest.fiot;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -24,7 +22,7 @@ import com.fireflyest.fiot.util.StatusBarUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends BaseActivity {
 
     public static final String TAG = "HomeActivity";
 
@@ -70,16 +68,18 @@ public class HomeActivity extends AppCompatActivity {
 
         // 设置列表
         List<Setting> settingList = new ArrayList<>();
+        settingList.add(new Setting("家庭信息"));
         settingList.add(new Setting("名称", SettingType.EDIT_TEXT, home.getName(), false, true));
         settingList.add(new Setting("位置", SettingType.TEXT, "", false, false));
         settingList.add(new Setting());
         settingList.add(new Setting("房间", SettingType.TEXT, home.getRooms(), false, false));
         settingList.add(new Setting("设备数量", SettingType.TEXT, "1", false, false));
         settingList.add(new Setting());
+        settingList.add(new Setting("个性化", SettingType.TEXT, "默认", false, false));
+        settingList.add(new Setting("连接配置"));
         settingList.add(new Setting("WiFi", SettingType.WIFI, home.getWifi(), false, true));
         settingList.add(new Setting("WiFi密码", SettingType.PASSWORD, home.getPassword(), false, true));
         settingList.add(new Setting());
-        settingList.add(new Setting("个性化", SettingType.TEXT, "默认", false, false));
 
         itemAdapter = new SettingItemAdapter(this, settingList);
         binding.homeSetting.setAdapter(itemAdapter);
@@ -104,10 +104,7 @@ public class HomeActivity extends AppCompatActivity {
         });
 
         // 注册广播
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
-        intentFilter.addAction(WifiManager.EXTRA_WIFI_STATE);
-        this.registerReceiver(receiver, intentFilter);
+        registerBroadcastReceiver(receiver, WifiManager.SCAN_RESULTS_AVAILABLE_ACTION, WifiManager.EXTRA_WIFI_STATE);
 
         // 扫描wifi
         if (!wifiManager.isWifiEnabled()) {
@@ -128,12 +125,6 @@ public class HomeActivity extends AppCompatActivity {
     public void onBackPressed() {
         this.back();
         super.onBackPressed();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        this.unregisterReceiver(receiver);
     }
 
     private void back(){

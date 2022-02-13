@@ -1,8 +1,6 @@
 package com.fireflyest.fiot;
 
 import androidx.annotation.Nullable;
-import androidx.databinding.BindingMethod;
-import androidx.databinding.BindingMethods;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -11,18 +9,10 @@ import androidx.viewpager.widget.ViewPager;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.EditText;
 
 import com.fireflyest.fiot.adapter.ViewPagerAdapter;
 import com.fireflyest.fiot.bean.Device;
@@ -34,7 +24,6 @@ import com.fireflyest.fiot.model.MainViewModel;
 import com.fireflyest.fiot.service.BleIntentService;
 import com.fireflyest.fiot.ui.DeviceFragment;
 import com.fireflyest.fiot.ui.MineFragment;
-import com.fireflyest.fiot.util.AnimationUtils;
 import com.fireflyest.fiot.util.CalendarUtil;
 import com.fireflyest.fiot.util.StatusBarUtil;
 import com.fireflyest.fiot.util.ToastUtil;
@@ -195,41 +184,6 @@ public class MainActivity extends BaseActivity {
     protected void onDestroy() {
         model.getDevices().clear();
         super.onDestroy();
-    }
-
-
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            View view = getCurrentFocus();
-            if (isShouldHideInput(view, event)) {
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                if (imm != null) {
-                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                    getCurrentFocus().clearFocus();
-                }
-            }
-            return super.dispatchTouchEvent(event);
-        }
-        if (getWindow().superDispatchTouchEvent(event)) {
-            return true;
-        }
-        return onTouchEvent(event);
-    }
-
-    private boolean isShouldHideInput(View view, MotionEvent event) {
-        if (view instanceof EditText) {
-            int[] leftTop = {0, 0};
-            //获取输入框当前的location位置
-            view.getLocationInWindow(leftTop);
-            int left = leftTop[0];
-            int top = leftTop[1];
-            int bottom = top + view.getHeight();
-            int right = left + view.getWidth();
-            // 点击的是输入框区域，保留点击EditText的事件
-            return !(event.getX() > left) || !(event.getX() < right) || !(event.getY() > top) || !(event.getY() < bottom);
-        }
-        return false;
     }
 
 }

@@ -16,6 +16,7 @@ import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.fireflyest.fiot.R;
+import com.fireflyest.fiot.bean.Command;
 import com.fireflyest.fiot.bean.Setting;
 import com.fireflyest.fiot.data.SettingType;
 import com.fireflyest.fiot.databinding.ItemSettingEditBinding;
@@ -106,6 +107,38 @@ public class SettingItemAdapter extends RecyclerView.Adapter<SettingItemAdapter.
         Log.d(TAG, "onBindViewHolder -> " + setting.toString());
         Log.d(TAG, "position -> " + position);
 
+        // 0 1 2 3 分别为 单一、上、中、下
+        int locType = 0;
+        if (position > 0){
+            Setting pre = settings.get(position-1);
+            if (pre.getType() == SettingType.TITLE || pre.getType() == SettingType.LINE){
+                // 上一条是标题或分割线 说明在最前面
+                // 判断是否有下一条
+                if(position == settings.size()-1){
+                    locType = 0;
+                }else {
+                    Setting next = settings.get(position + 1);
+                    if (next.getType() == SettingType.TITLE || next.getType() == SettingType.LINE){
+                        locType = 0;
+                    }else{
+                        locType = 1;
+                    }
+                }
+            }else if (position != settings.size()-1){
+                // 有下一条 说明在中间
+                Setting next = settings.get(position + 1);
+                if (next.getType() == SettingType.TITLE || next.getType() == SettingType.LINE){
+                    locType = 3;
+                }else{
+                    locType = 2;
+                }
+            }else {
+                // 在最后
+                locType = 3;
+            }
+        }
+
+
         switch (viewType){
             default:
             case SettingType.TITLE: {
@@ -121,19 +154,48 @@ public class SettingItemAdapter extends RecyclerView.Adapter<SettingItemAdapter.
             case SettingType.TEXT: {
                 ItemSettingTextBinding binding = (ItemSettingTextBinding) holder.binding;
                 binding.setSetting(setting);
+                if (locType == 3){
+                    binding.settingBackground.setBackgroundResource(R.drawable.round_bottom_white);
+                }else if (locType == 2){
+                    binding.settingBackground.setBackgroundResource(R.drawable.white);
+                }else if(locType == 1){
+                    binding.settingBackground.setBackgroundResource(R.drawable.round_top_white);
+                }else{
+                    binding.settingBackground.setBackgroundResource(R.drawable.round_white);
+                }
                 break;
             }
             case SettingType.SWITCH: {
                 ItemSettingSwitchBinding binding = (ItemSettingSwitchBinding) holder.binding;
                 binding.setSetting(setting);
+                if (locType == 3){
+                    binding.settingBackground.setBackgroundResource(R.drawable.round_bottom_white);
+                }else if (locType == 2){
+                    binding.settingBackground.setBackgroundResource(R.drawable.white);
+                }else if(locType == 1){
+                    binding.settingBackground.setBackgroundResource(R.drawable.round_top_white);
+                }else{
+                    binding.settingBackground.setBackgroundResource(R.drawable.round_white);
+                }
                 break;
             }
             case SettingType.WIFI: {
                 ItemSettingListBinding binding = (ItemSettingListBinding) holder.binding;
                 binding.setSetting(setting);
+                if (locType == 3){
+                    binding.settingBackground.setBackgroundResource(R.drawable.round_bottom_white);
+                }else if (locType == 2){
+                    binding.settingBackground.setBackgroundResource(R.drawable.white);
+                }else if(locType == 1){
+                    binding.settingBackground.setBackgroundResource(R.drawable.round_top_white);
+                }else{
+                    binding.settingBackground.setBackgroundResource(R.drawable.round_white);
+                }
                 wifiListAdapter.clear();
                 if (setting.getStringValue() != null) {
                     wifiListAdapter.add(setting.getStringValue());
+                }else {
+                    wifiListAdapter.add("选择WiFi");
                 }
                 //第四步：将适配器添加到下拉列表上
                 binding.settingSpinner.setAdapter(wifiListAdapter);
@@ -152,6 +214,15 @@ public class SettingItemAdapter extends RecyclerView.Adapter<SettingItemAdapter.
             case SettingType.EDIT_TEXT: {
                 ItemSettingEditBinding binding = (ItemSettingEditBinding) holder.binding;
                 binding.setSetting(setting);
+                if (locType == 3){
+                    binding.settingBackground.setBackgroundResource(R.drawable.round_bottom_white);
+                }else if (locType == 2){
+                    binding.settingBackground.setBackgroundResource(R.drawable.white);
+                }else if(locType == 1){
+                    binding.settingBackground.setBackgroundResource(R.drawable.round_top_white);
+                }else{
+                    binding.settingBackground.setBackgroundResource(R.drawable.round_white);
+                }
                 binding.settingEdit.setEnabled(setting.isEnable());
                 // 点击
                 if (setting.isEnable()) holder.itemView.setOnClickListener(v ->{
@@ -176,6 +247,15 @@ public class SettingItemAdapter extends RecyclerView.Adapter<SettingItemAdapter.
             case SettingType.PASSWORD: {
                 ItemSettingPasswordBinding binding = (ItemSettingPasswordBinding) holder.binding;
                 binding.setSetting(setting);
+                if (locType == 3){
+                    binding.settingBackground.setBackgroundResource(R.drawable.round_bottom_white);
+                }else if (locType == 2){
+                    binding.settingBackground.setBackgroundResource(R.drawable.white);
+                }else if(locType == 1){
+                    binding.settingBackground.setBackgroundResource(R.drawable.round_top_white);
+                }else{
+                    binding.settingBackground.setBackgroundResource(R.drawable.round_white);
+                }
                 binding.settingEdit.setEnabled(setting.isEnable());
                 // 点击
                 if (setting.isEnable()) holder.itemView.setOnClickListener(v ->{
@@ -200,6 +280,15 @@ public class SettingItemAdapter extends RecyclerView.Adapter<SettingItemAdapter.
             case SettingType.EDIT_NUMBER: {
                 ItemSettingNumberBinding binding = (ItemSettingNumberBinding) holder.binding;
                 binding.setSetting(setting);
+                if (locType == 3){
+                    binding.settingBackground.setBackgroundResource(R.drawable.round_bottom_white);
+                }else if (locType == 2){
+                    binding.settingBackground.setBackgroundResource(R.drawable.white);
+                }else if(locType == 1){
+                    binding.settingBackground.setBackgroundResource(R.drawable.round_top_white);
+                }else{
+                    binding.settingBackground.setBackgroundResource(R.drawable.round_white);
+                }
                 binding.settingEdit.setEnabled(setting.isEnable());
                 // 点击
                 if (setting.isEnable()) holder.itemView.setOnClickListener(v ->{
