@@ -3,6 +3,7 @@ package com.fireflyest.fiot.model;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
@@ -36,7 +37,6 @@ public class ControlViewModel extends ViewModel {
         @Override
         public void onReceive(Context context, Intent intent) {
             String address = intent.getStringExtra(BleIntentService.EXTRA_ADDRESS);
-            Log.d(TAG, "接收到广播 -> " + address);
             Boolean hex = hexData.getValue();
             if (hex == null) hex = false;
             switch (intent.getAction()){
@@ -51,6 +51,8 @@ public class ControlViewModel extends ViewModel {
                         byte[] bytesData = intent.getByteArrayExtra(BleIntentService.EXTRA_DATA);
                         String data = hex && bytesData != null  ? ConvertUtil.bytesToHexString(bytesData) :
                                 new String(bytesData);
+                        if(TextUtils.isEmpty(data)) break;
+                        Log.d(TAG, "接收到数据 -> " + data);
                         commandData.setValue(new Command(0,
                                 deviceData.getValue().getAddress(),
                                 false,
@@ -65,7 +67,7 @@ public class ControlViewModel extends ViewModel {
                         Log.d(TAG, "写入数据反馈广播 -> " + (success ? "写入成功" : "写入失败"));
                         byte[] bytesData = intent.getByteArrayExtra(BleIntentService.EXTRA_DATA);
                         String data = hex && bytesData != null  ? ConvertUtil.bytesToHexString(bytesData) :
-                                new String(bytesData);
+                                new String(bytesData).substring(0, bytesData.length-1);
                         Log.d(TAG, "更新指令 -> " + data);
                         Command command = getCommand(data);
                         if (command == null) return;

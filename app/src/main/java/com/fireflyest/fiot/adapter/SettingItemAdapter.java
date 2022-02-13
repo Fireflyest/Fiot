@@ -121,26 +121,6 @@ public class SettingItemAdapter extends RecyclerView.Adapter<SettingItemAdapter.
             case SettingType.TEXT: {
                 ItemSettingTextBinding binding = (ItemSettingTextBinding) holder.binding;
                 binding.setSetting(setting);
-//                if (setting.isEnable()){
-//                    holder.itemView.setOnClickListener(v ->{
-//                        final EditText editText = new EditText(context);
-//                        editText.setText(setting.getStringValue());
-//                        AlertDialog.Builder dialog =  new AlertDialog.Builder(context)
-//                                .setTitle("修改" + setting.getName()).setView(editText)
-//                                .setPositiveButton("确定", (d, which) -> {
-//                                    String after = editText.getText().toString();
-//                                    // 判断是否修改
-//                                    if(!setting.getStringValue().equals(after)){
-//                                        setting.setStringValue(after);
-//                                        if (editListener != null) editListener.onEdit(setting);
-//                                        updateItem(position);
-//                                    }
-//                                })
-//                                .setNegativeButton("取消", (d, which) -> editText.getText());
-//
-//                        dialog.show();
-//                    });
-//                }
                 break;
             }
             case SettingType.SWITCH: {

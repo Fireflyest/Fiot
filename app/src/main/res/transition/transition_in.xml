@@ -2,7 +2,4 @@
 <transitionSet xmlns:android="http://schemas.android.com/apk/res/android">
     <fade
         android:duration="300" />
-    <slide
-        android:slideEdge="bottom"
-        android:duration="300"/>
 </transitionSet>

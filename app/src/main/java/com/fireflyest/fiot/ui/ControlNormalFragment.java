@@ -77,6 +77,7 @@ public class ControlNormalFragment extends Fragment {
             AnimationUtils.click(v);
         });
 
+        // 输入框变化监听
         binding.commandEdit.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -99,31 +100,40 @@ public class ControlNormalFragment extends Fragment {
                 }
             }
         });
+
+        // 点击发送按钮
         binding.commandSend.setOnClickListener(v -> {
             AnimationUtils.click(v);
             String text = model.getText();
+            // todo 特征值判断
             if (TextUtils.isEmpty(device.getRoom()) || TextUtils.isEmpty(device.getRoom())){
                 ToastUtil.showShort(getContext(), "未配置蓝牙属性");
                 return;
             }
+            // 是否十六进制 判断格式是否正确
             boolean hex = isHex();
             if (hex && (!patten.matcher(text).matches() || text.length()%2 != 0)){
                 ToastUtil.showShort(getContext(), "输入格式错误");
                 return;
             }
-            // 新建指令
+            // 新建指令 用于显示
             Command command = new Command(0, device.getAddress(), true, false, CalendarUtil.getDate(), text, CommandType.SEND);
             commandItemAdapter.addItem(command);
+            // 添加结束符
+            if(!hex) text = text + ";";
             // 发送指令
             BleIntentService.write(getContext(), device.getAddress(), device.getRoom(), device.getDesc(),  hex ? ConvertUtil.getHexBytes(text) : text.getBytes());
             binding.commandEdit.setText("");
         });
+
+        // 点击加号
         binding.commandMore.setOnClickListener(v -> {
             AnimationUtils.click(v);
             ToastUtil.showShort(getContext(), "more");
             BleIntentService.readCharacteristic(getContext(), device.getAddress(), device.getRoom(), device.getDesc());
         });
 
+        // 更新指令
         model.getCommandData().observe(getViewLifecycleOwner(), command -> {
             Log.d(TAG, "指令更新 -> "+ command.toString());
             int index = model.getCommands().indexOf(command);

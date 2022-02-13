@@ -64,33 +64,29 @@ public class ControlActivity extends BaseActivity {
         binding.controlToolbar.setNavigationOnClickListener(v -> finishAfterTransition());
 
         // 更新设备数据
-//        model.getDeviceData().observe(this, device -> {
-//            Log.d(TAG, device.toString());
-//            binding.setDeviceName(device.getName());
-//            if (device.getCharacteristic() != null) {
-//                binding.setSubtitle(device.getCharacteristic().substring(0, 8));
-//            }else {
-//                binding.setSubtitle("00000000");
-//            }
-//            // 根据设备类型切换布局
-//            switch (device.getType()){
-//                case DeviceType.NON:
-////                    this.startConfigActivity();
-////                    break;
-//                case DeviceType.LOCAL:
-//                case DeviceType.REMOTE:
-//                default:
-//                    this.getSupportFragmentManager()
-//                            .beginTransaction()
-//                            .replace(R.id.control_fragment, new ControlNormalFragment())
-//                            .commit();
+        model.getDeviceData().observe(this, device -> {
+            Log.d(TAG, device.toString());
+            binding.setDevice(device);
+
+            // 根据设备类型切换布局
+            switch (device.getType()){
+                case DeviceType.NON:
+//                    this.startConfigActivity();
 //                    break;
-//                case DeviceType.ENVIRONMENT:
-//                    // TODO: 2021/4/30
-//
-//                    break;
-//            }
-//        });
+                case DeviceType.LOCAL:
+                case DeviceType.REMOTE:
+                default:
+                    this.getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.control_fragment, new ControlNormalFragment())
+                            .commit();
+                    break;
+                case DeviceType.ENVIRONMENT:
+                    // TODO: 2021/4/30
+
+                    break;
+            }
+        });
 
         Intent intent = getIntent();
         Device d = intent.getParcelableExtra(EXTRA_DEVICE);

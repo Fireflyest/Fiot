@@ -177,7 +177,9 @@ public class MainActivity extends BaseActivity {
                     ToastUtil.showShort(this, "设备已存在");
                     break;
                 }
-                model.getDeviceData().setValue(new Device(0, name, address, true, DeviceType.NON, CalendarUtil.getDate()));
+                Device device = new Device(0, name, address, true, DeviceType.NON, CalendarUtil.getDate());
+                device.setDesc(address);
+                model.getDeviceData().setValue(device);
                 break;
             case REQUEST_HOME:
                 if (resultCode != Activity.RESULT_OK) return;
