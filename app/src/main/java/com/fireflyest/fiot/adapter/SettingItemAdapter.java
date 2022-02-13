@@ -1,27 +1,33 @@
 package com.fireflyest.fiot.adapter;
 
 import android.content.Context;
-import android.content.DialogInterface;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.fireflyest.fiot.R;
 import com.fireflyest.fiot.bean.Setting;
 import com.fireflyest.fiot.data.SettingType;
+import com.fireflyest.fiot.databinding.ItemSettingEditBinding;
 import com.fireflyest.fiot.databinding.ItemSettingLineBinding;
+import com.fireflyest.fiot.databinding.ItemSettingListBinding;
+import com.fireflyest.fiot.databinding.ItemSettingNumberBinding;
+import com.fireflyest.fiot.databinding.ItemSettingPasswordBinding;
 import com.fireflyest.fiot.databinding.ItemSettingSwitchBinding;
 import com.fireflyest.fiot.databinding.ItemSettingTextBinding;
 import com.fireflyest.fiot.databinding.ItemSettingTitleBinding;
-import com.fireflyest.fiot.util.ToastUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SettingItemAdapter extends RecyclerView.Adapter<SettingItemAdapter.ViewHolder> {
@@ -30,6 +36,8 @@ public class SettingItemAdapter extends RecyclerView.Adapter<SettingItemAdapter.
     private final List<Setting> settings;
 
     public static final String TAG = SettingItemAdapter.class.getSimpleName();
+
+    private final ArrayAdapter<String> wifiListAdapter;
 
     public interface OnItemEditListener {
         void onEdit(Setting setting);
@@ -40,6 +48,16 @@ public class SettingItemAdapter extends RecyclerView.Adapter<SettingItemAdapter.
     public SettingItemAdapter(Context context, List<Setting> settings) {
         this.context = context;
         this.settings = settings;
+
+        List<String> wifiList = new ArrayList<>();
+        wifiListAdapter = new ArrayAdapter<>(context, R.layout.item_spinner, wifiList);
+        //第三步：设置下拉列表下拉时的菜单样式
+        wifiListAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+    }
+
+    public ArrayAdapter<String> getWifiListAdapter() {
+        return wifiListAdapter;
     }
 
     @NonNull
@@ -48,22 +66,31 @@ public class SettingItemAdapter extends RecyclerView.Adapter<SettingItemAdapter.
         ViewDataBinding binding;
         switch (viewType){
             default:
-            case SettingType.TITLE: {
+            case SettingType.TITLE:
                 binding = ItemSettingTitleBinding.inflate(LayoutInflater.from(context), parent, false);
                 break;
-            }
-            case SettingType.LINE: {
+            case SettingType.LINE:
                 binding = ItemSettingLineBinding.inflate(LayoutInflater.from(context), parent, false);
                 break;
-            }
-            case SettingType.TEXT:{
+            case SettingType.TEXT:
                 binding = ItemSettingTextBinding.inflate(LayoutInflater.from(context), parent, false);
                 break;
-            }
-            case SettingType.SWITCH:{
+            case SettingType.LIST:
+            case SettingType.WIFI:
+                binding = ItemSettingListBinding.inflate(LayoutInflater.from(context), parent, false);
+                break;
+            case SettingType.SWITCH:
                 binding = ItemSettingSwitchBinding.inflate(LayoutInflater.from(context), parent, false);
                 break;
-            }
+            case SettingType.EDIT_TEXT:
+                binding = ItemSettingEditBinding.inflate(LayoutInflater.from(context), parent, false);
+                break;
+            case SettingType.PASSWORD:
+                binding = ItemSettingPasswordBinding.inflate(LayoutInflater.from(context), parent, false);
+                break;
+            case SettingType.EDIT_NUMBER:
+                binding = ItemSettingNumberBinding.inflate(LayoutInflater.from(context), parent, false);
+                break;
 //            case SettingType.NAVIGATION:{
 //                binding = ItemSettingNavigationBinding.inflate(LayoutInflater.from(context), parent, false);
 //                break;
@@ -94,32 +121,124 @@ public class SettingItemAdapter extends RecyclerView.Adapter<SettingItemAdapter.
             case SettingType.TEXT: {
                 ItemSettingTextBinding binding = (ItemSettingTextBinding) holder.binding;
                 binding.setSetting(setting);
-                // 可修改
-                if (setting.isEnable()){
-                    holder.itemView.setOnClickListener(v ->{
-                        final EditText editText = new EditText(context);
-                        editText.setText(setting.getStringValue());
-                        AlertDialog.Builder dialog =  new AlertDialog.Builder(context)
-                                .setTitle("修改" + setting.getName()).setView(editText)
-                                .setPositiveButton("确定", (d, which) -> {
-                                    String after = editText.getText().toString();
-                                    // 判断是否修改
-                                    if(!setting.getStringValue().equals(after)){
-                                        setting.setStringValue(after);
-                                        if (editListener != null) editListener.onEdit(setting);
-                                        updateItem(position);
-                                    }
-                                })
-                                .setNegativeButton("取消", (d, which) -> editText.getText());
-
-                        dialog.show();
-                    });
-                }
+//                if (setting.isEnable()){
+//                    holder.itemView.setOnClickListener(v ->{
+//                        final EditText editText = new EditText(context);
+//                        editText.setText(setting.getStringValue());
+//                        AlertDialog.Builder dialog =  new AlertDialog.Builder(context)
+//                                .setTitle("修改" + setting.getName()).setView(editText)
+//                                .setPositiveButton("确定", (d, which) -> {
+//                                    String after = editText.getText().toString();
+//                                    // 判断是否修改
+//                                    if(!setting.getStringValue().equals(after)){
+//                                        setting.setStringValue(after);
+//                                        if (editListener != null) editListener.onEdit(setting);
+//                                        updateItem(position);
+//                                    }
+//                                })
+//                                .setNegativeButton("取消", (d, which) -> editText.getText());
+//
+//                        dialog.show();
+//                    });
+//                }
                 break;
             }
             case SettingType.SWITCH: {
                 ItemSettingSwitchBinding binding = (ItemSettingSwitchBinding) holder.binding;
                 binding.setSetting(setting);
+                break;
+            }
+            case SettingType.WIFI: {
+                ItemSettingListBinding binding = (ItemSettingListBinding) holder.binding;
+                binding.setSetting(setting);
+                wifiListAdapter.clear();
+                if (setting.getStringValue() != null) {
+                    wifiListAdapter.add(setting.getStringValue());
+                }
+                //第四步：将适配器添加到下拉列表上
+                binding.settingSpinner.setAdapter(wifiListAdapter);
+                binding.settingSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        setting.setStringValue(wifiListAdapter.getItem(position));
+                        if (editListener != null) editListener.onEdit(setting);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) { }
+                });
+                break;
+            }
+            case SettingType.EDIT_TEXT: {
+                ItemSettingEditBinding binding = (ItemSettingEditBinding) holder.binding;
+                binding.setSetting(setting);
+                binding.settingEdit.setEnabled(setting.isEnable());
+                // 点击
+                if (setting.isEnable()) holder.itemView.setOnClickListener(v ->{
+                    binding.settingEdit.requestFocus();
+                    ((InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(binding.settingEdit, 0);
+                });
+                // 修改
+                binding.settingEdit.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) { }
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        String after = s.toString();
+                        setting.setStringValue(after);
+                        if (editListener != null) editListener.onEdit(setting);
+                    }
+                });
+                break;
+            }
+            case SettingType.PASSWORD: {
+                ItemSettingPasswordBinding binding = (ItemSettingPasswordBinding) holder.binding;
+                binding.setSetting(setting);
+                binding.settingEdit.setEnabled(setting.isEnable());
+                // 点击
+                if (setting.isEnable()) holder.itemView.setOnClickListener(v ->{
+                    binding.settingEdit.requestFocus();
+                    ((InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(binding.settingEdit, 0);
+                });
+                // 修改
+                binding.settingEdit.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) { }
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        String after = s.toString();
+                        setting.setStringValue(after);
+                        if (editListener != null) editListener.onEdit(setting);
+                    }
+                });
+                break;
+            }
+            case SettingType.EDIT_NUMBER: {
+                ItemSettingNumberBinding binding = (ItemSettingNumberBinding) holder.binding;
+                binding.setSetting(setting);
+                binding.settingEdit.setEnabled(setting.isEnable());
+                // 点击
+                if (setting.isEnable()) holder.itemView.setOnClickListener(v ->{
+                    binding.settingEdit.requestFocus();
+                    ((InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(binding.settingEdit, 0);
+                });
+                // 修改
+                binding.settingEdit.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) { }
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        String after = s.toString();
+                        setting.setStringValue(after);
+                        if (editListener != null) editListener.onEdit(setting);
+                    }
+                });
                 break;
             }
         }

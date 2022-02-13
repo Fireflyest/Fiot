@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
+import android.view.animation.OvershootInterpolator;
 
 public class AnimationUtils {
 
@@ -19,9 +20,10 @@ public class AnimationUtils {
     public static void click(View view){
         view.animate()
                 .setInterpolator(decelerateInterpolator)
-                .scaleY(0.94F)
-                .scaleX(0.94F)
+                .scaleY(0.88F)
+                .scaleX(0.88F)
                 .setDuration(120)
+                .setInterpolator(new OvershootInterpolator())
                 .setListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationCancel(Animator animation) {
@@ -31,11 +33,13 @@ public class AnimationUtils {
 
                     @Override
                     public void onAnimationEnd(Animator animation) {
+//                        view.setScaleX(1);
+//                        view.setScaleY(1);
                         view.animate()
                                 .setInterpolator(decelerateInterpolator)
                                 .scaleX(1.02F)
                                 .scaleY(1.02F)
-                                .setDuration(140)
+                                .setDuration(220)
                                 .setListener(new AnimatorListenerAdapter() {
                                     @Override
                                     public void onAnimationCancel(Animator animation) {

@@ -32,6 +32,8 @@ import com.fireflyest.fiot.bean.Home;
 import com.fireflyest.fiot.databinding.FragmentDeviceBinding;
 import com.fireflyest.fiot.model.MainViewModel;
 import com.fireflyest.fiot.service.BleIntentService;
+import com.fireflyest.fiot.util.AnimationUtils;
+import com.fireflyest.fiot.util.DpOrPxUtil;
 import com.fireflyest.fiot.util.ToastUtil;
 
 import java.lang.reflect.Array;
@@ -116,34 +118,7 @@ public class DeviceFragment extends Fragment {
             });
 
             popupWindow.setTouchable(true);
-//            popupWindow.setTouchInterceptor((vp, event) -> {
-//                vp.callOnClick();
-//                return false;
-//                // 这里如果返回true的话，touch事件将被拦截
-//                // 拦截后 PopupWindow的onTouchEvent不被调用，这样点击外部区域无法dismiss
-//            });
-            popupWindow.showAsDropDown(v, 50, 0);
-
-            // 背景暗淡
-            if (activity != null) {
-                WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
-                lp.alpha = 0.7f;//设置阴影透明度
-                activity.getWindow().setAttributes(lp);
-                popupWindow.setOnDismissListener(() -> {
-                    WindowManager.LayoutParams lp1 = activity.getWindow().getAttributes();
-                    lp1.alpha = 1f;
-                    activity.getWindow().setAttributes(lp1);
-                });
-            }
-
-//            PopupMenu popupMenu = new PopupMenu(getContext(), v, Gravity.BOTTOM, 0, R.style.popMenu_style);
-//            popupMenu.getMenuInflater().inflate(R.menu.menu_home, popupMenu.getMenu());
-//            if (model.getHomesData().getValue() != null) {
-//                for (Home home : model.getHomesData().getValue()) {
-//                    popupMenu.getMenu().add(home.getName());
-//                }
-//            }
-//            popupMenu.show();
+            popupWindow.showAsDropDown(v, 0, DpOrPxUtil.dip2px(v.getContext(), -20));
         });
 
         //  房间管理
@@ -155,38 +130,9 @@ public class DeviceFragment extends Fragment {
             // 选择的家
             TextView select = popView.findViewById(R.id.room_select);
 
-            //这些为了点击非PopupWindow区域，PopupWindow会消失的，如果没有下面的
-            //代码的话，你会发现，当你把PopupWindow显示出来了，无论你按多少次后退键
-            //PopupWindow并不会关闭，而且退不出程序，加上下述代码可以解决这个问题
             popupWindow.setTouchable(true);
-//            popupWindow.setTouchInterceptor((vp, event) -> {
-//                vp.callOnClick();
-//                return false;
-//                // 这里如果返回true的话，touch事件将被拦截
-//                // 拦截后 PopupWindow的onTouchEvent不被调用，这样点击外部区域无法dismiss
-//            });
-            popupWindow.showAsDropDown(v, 0, 0);
+            popupWindow.showAsDropDown(v, 0, DpOrPxUtil.dip2px(v.getContext(), -20));
 
-            // 背景暗淡
-            if (activity != null) {
-                WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
-                lp.alpha = 0.7f;//设置阴影透明度
-                activity.getWindow().setAttributes(lp);
-                popupWindow.setOnDismissListener(() -> {
-                    WindowManager.LayoutParams lp1 = activity.getWindow().getAttributes();
-                    lp1.alpha = 1f;
-                    activity.getWindow().setAttributes(lp1);
-                });
-            }
-
-//            PopupMenu popupMenu = new PopupMenu(getContext(), v, Gravity.BOTTOM, 0, R.style.popMenu_style);
-//            popupMenu.getMenuInflater().inflate(R.menu.menu_home, popupMenu.getMenu());
-//            if (model.getHomesData().getValue() != null) {
-//                for (Home home : model.getHomesData().getValue()) {
-//                    popupMenu.getMenu().add(home.getName());
-//                }
-//            }
-//            popupMenu.show();
         });
 
         // 设备列表

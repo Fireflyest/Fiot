@@ -12,4 +12,14 @@ public class SettingType {
 
     public static final int NAVIGATION = 4;
 
+    public static final int PASSWORD = 5;
+
+    public static final int EDIT_TEXT = 6;
+
+    public static final int EDIT_NUMBER = 7;
+
+    public static final int WIFI = 8;
+
+    public static final int LIST = 9;
+
 }
