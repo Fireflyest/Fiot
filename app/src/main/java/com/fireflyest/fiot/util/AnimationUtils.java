@@ -96,4 +96,23 @@ public class AnimationUtils {
                 });
     }
 
+    public static void hide(View view){
+        view.animate()
+                .setInterpolator(decelerateInterpolator)
+                .alpha(0)
+                .scaleY(0)
+                .setDuration(400)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+                        view.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        view.setVisibility(View.GONE);
+                    }
+                });
+    }
+
 }

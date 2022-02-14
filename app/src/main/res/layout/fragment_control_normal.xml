@@ -16,14 +16,36 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?attr/backgroundColor">
+        android:background="@drawable/white">
+
+        <Spinner
+            android:id="@+id/control_service"
+            android:layout_width="90dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/round_white_stroke"
+            tools:listitem="@layout/item_service"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/control_characteristic"
+            android:layout_marginHorizontal="6dp"/>
+
+        <Spinner
+            android:id="@+id/control_characteristic"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/round_white_stroke"
+            tools:listitem="@layout/item_characteristic"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/control_service"
+            android:layout_marginHorizontal="6dp"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/control_command_list"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintBottom_toTopOf="@+id/control_command_box"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/control_service"
             app:layout_constraintVertical_bias="0.0"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_command_recevie"

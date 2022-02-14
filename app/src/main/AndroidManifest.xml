@@ -32,7 +32,8 @@
             android:windowSoftInputMode="adjustNothing"/>
         <activity android:name=".LoginActivity" />
         <activity android:name=".ConfigActivity" />
-        <activity android:name=".ControlActivity" />
+        <activity
+            android:name=".ControlActivity" />
         <activity
             android:name=".ScanActivity"
             android:label=""

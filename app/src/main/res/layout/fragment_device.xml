@@ -203,7 +203,7 @@
                     android:visibility="gone"
                     android:text="@string/empty"
                     android:gravity="center"
-                    android:layout_marginHorizontal="6dp"
+                    android:layout_marginHorizontal="12dp"
                     app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>

@@ -23,6 +23,11 @@ public class Characteristic {
         this.name = name;
     }
 
+    public Characteristic(String name, String usage) {
+        this.name = name;
+        this.usage = usage;
+    }
+
     public Characteristic(String name, String uuid, String service, String usage, String proprty) {
         this.name = name;
         this.uuid = uuid;

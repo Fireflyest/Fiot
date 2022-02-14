@@ -14,11 +14,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 
 import com.fireflyest.fiot.ControlActivity;
+import com.fireflyest.fiot.adapter.CharacteristicItemAdapter;
 import com.fireflyest.fiot.adapter.CommandItemAdapter;
+import com.fireflyest.fiot.adapter.ServiceItemAdapter;
+import com.fireflyest.fiot.bean.Characteristic;
 import com.fireflyest.fiot.bean.Command;
 import com.fireflyest.fiot.bean.Device;
+import com.fireflyest.fiot.bean.Service;
 import com.fireflyest.fiot.data.CommandType;
 import com.fireflyest.fiot.databinding.FragmentControlNormalBinding;
 import com.fireflyest.fiot.model.ControlViewModel;
@@ -28,6 +33,8 @@ import com.fireflyest.fiot.util.CalendarUtil;
 import com.fireflyest.fiot.util.ConvertUtil;
 import com.fireflyest.fiot.util.ToastUtil;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class ControlNormalFragment extends Fragment {
@@ -41,8 +48,16 @@ public class ControlNormalFragment extends Fragment {
     private FragmentControlNormalBinding binding;
 
     private CommandItemAdapter commandItemAdapter;
+    private ServiceItemAdapter serviceItemAdapter;
+    private CharacteristicItemAdapter characteristicItemAdapter;
+
+    private final List<Service> services = new ArrayList<>();
+    private final List<Characteristic> characteristics = new ArrayList<>();
 
     private Device device;
+
+    private String serviceUUID = null;
+    private String characteristicUUID = null;
 
     public ControlNormalFragment() {
     }
@@ -106,7 +121,7 @@ public class ControlNormalFragment extends Fragment {
             AnimationUtils.click(v);
             String text = model.getText();
             // todo 特征值判断
-            if (TextUtils.isEmpty(device.getRoom()) || TextUtils.isEmpty(device.getRoom())){
+            if (TextUtils.isEmpty(serviceUUID) || TextUtils.isEmpty(characteristicUUID)){
                 ToastUtil.showShort(getContext(), "未配置蓝牙属性");
                 return;
             }
@@ -122,7 +137,7 @@ public class ControlNormalFragment extends Fragment {
             // 添加结束符
             if(!hex) text = text + ";";
             // 发送指令
-            BleIntentService.write(getContext(), device.getAddress(), device.getRoom(), device.getDesc(),  hex ? ConvertUtil.getHexBytes(text) : text.getBytes());
+            BleIntentService.write(getContext(), device.getAddress(), serviceUUID, characteristicUUID,  hex ? ConvertUtil.getHexBytes(text) : text.getBytes());
             binding.commandEdit.setText("");
         });
 
@@ -130,7 +145,7 @@ public class ControlNormalFragment extends Fragment {
         binding.commandMore.setOnClickListener(v -> {
             AnimationUtils.click(v);
             ToastUtil.showShort(getContext(), "more");
-            BleIntentService.readCharacteristic(getContext(), device.getAddress(), device.getRoom(), device.getDesc());
+            BleIntentService.readCharacteristic(getContext(), device.getAddress(), serviceUUID, characteristicUUID);
         });
 
         // 更新指令
@@ -144,8 +159,71 @@ public class ControlNormalFragment extends Fragment {
             }
         });
 
+        // 指令列表更新
         commandItemAdapter = new CommandItemAdapter(getContext(), model.getCommands());
         binding.controlCommandList.setAdapter(commandItemAdapter);
+
+        // 服务特征列表适配器
+        serviceItemAdapter = new ServiceItemAdapter(getContext(), services);
+        characteristicItemAdapter = new CharacteristicItemAdapter(getContext(), characteristics);
+        binding.controlService.setAdapter(serviceItemAdapter);
+        binding.controlCharacteristic.setAdapter(characteristicItemAdapter);
+
+        // 服务选项更新
+        model.getServicesData().observe(getViewLifecycleOwner(), s ->{
+            if (s != null) {
+                services.clear();
+                // 放置一个空选项
+                services.add(new Service("服务", "点击选择"));
+                services.addAll(s);
+                Log.d(TAG, "ServicesData ->" + services.toString());
+                serviceItemAdapter.notifyDataSetChanged();
+            }
+        });
+
+        // 特征选项更新
+        model.getCharacteristicsData().observe(getViewLifecycleOwner(), c ->{
+            if (c != null) {
+                characteristics.clear();
+                // 放置一个空选项
+                characteristics.add(new Characteristic("特征", "点击选择"));
+                characteristics.addAll(c);
+                Log.d(TAG, "CharacteristicsData ->" + c.toString());
+                characteristicItemAdapter.notifyDataSetChanged();
+            }
+        });
+
+        // 更新蓝牙服务可选列表
+        model.initServiceData(device.getAddress());
+
+        binding.controlService.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 0) return;
+                Service service = services.get(position);
+                String uuid = service.getUuid();
+                model.selectService(uuid);
+                Log.d(TAG, "SelectedService -> " + uuid);
+                serviceUUID = uuid;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
+
+        binding.controlCharacteristic.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 0) return;
+                Characteristic characteristic = characteristics.get(position);
+                String uuid = characteristic.getUuid();
+                Log.d(TAG, "SelectedCharacteristic -> " + uuid);
+                characteristicUUID = uuid;
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
+
 
     }
 

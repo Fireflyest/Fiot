@@ -17,6 +17,11 @@ public class Service {
         this.name = name;
     }
 
+    public Service(String name, String usage) {
+        this.name = name;
+        this.usage = usage;
+    }
+
     public Service(String name, String uuid, String usage) {
         this.name = name;
         this.uuid = uuid;

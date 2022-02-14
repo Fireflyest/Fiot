@@ -140,7 +140,7 @@ public class DeviceFragment extends Fragment {
         // 设备更新
         model.getDeviceData().observe(this.getViewLifecycleOwner(), device ->{
             if(binding.deviceEmpty.getVisibility() == View.VISIBLE) {
-                binding.deviceEmpty.setVisibility(View.GONE);
+                AnimationUtils.hide(binding.deviceEmpty);
             }
             // 判断是添加还是修改
             int index = model.getDeviceIndex(device.getAddress());
