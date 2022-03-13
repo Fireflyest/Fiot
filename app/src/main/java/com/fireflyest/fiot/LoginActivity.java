@@ -180,7 +180,7 @@ public class LoginActivity extends BaseActivity {
                     .build();
             String target = register ? "register" : "login";
 //            HttpUrl url = HttpUrl.get("http://www.ft0825.top/" + target)
-            HttpUrl url = HttpUrl.get("http://192.168.2.115:8080/" + target)
+            HttpUrl url = HttpUrl.get("http://"+DEBUG_URL+":8080/" + target)
                     .newBuilder()
                     .addQueryParameter("account", account)
                     .addQueryParameter("password", password)

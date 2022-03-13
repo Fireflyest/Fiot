@@ -33,6 +33,9 @@ public class Device implements Parcelable, Cloneable {
     // 连接状态
     private boolean connect;
 
+    // 是否已经配置
+    private boolean config;
+
     private int type;
 
     public Device(long id, String name, String address, boolean display, int type, long create) {
@@ -127,6 +130,14 @@ public class Device implements Parcelable, Cloneable {
         this.type = type;
     }
 
+    public boolean isConfig() {
+        return config;
+    }
+
+    public void setConfig(boolean config) {
+        this.config = config;
+    }
+
     @Override
     public String toString() {
         return "Device{" +
@@ -139,15 +150,11 @@ public class Device implements Parcelable, Cloneable {
                 ", create=" + create +
                 ", display=" + display +
                 ", connect=" + connect +
+                ", config=" + config +
                 ", type=" + type +
                 '}';
     }
 
-    /**
-     * 只判断数据是否一样就行
-     * @param o 要对比的对象
-     * @return 是否数据相同
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -158,12 +165,14 @@ public class Device implements Parcelable, Cloneable {
         if (id != device.id) return false;
         if (create != device.create) return false;
         if (display != device.display) return false;
+        if (connect != device.connect) return false;
+        if (config != device.config) return false;
         if (type != device.type) return false;
+        if (!name.equals(device.name)) return false;
         if (!nickname.equals(device.nickname)) return false;
-        if (!Objects.equals(name, device.name)) return false;
-        if (!Objects.equals(address, device.address)) return false;
-        if (!Objects.equals(room, device.room)) return false;
-        return Objects.equals(desc, device.desc);
+        if (!address.equals(device.address)) return false;
+        if (!room.equals(device.room)) return false;
+        return desc.equals(device.desc);
     }
 
     @Override
@@ -177,6 +186,7 @@ public class Device implements Parcelable, Cloneable {
         result = 31 * result + (int) (create ^ (create >>> 32));
         result = 31 * result + (display ? 1 : 0);
         result = 31 * result + (connect ? 1 : 0);
+        result = 31 * result + (config ? 1 : 0);
         result = 31 * result + type;
         return result;
     }
@@ -198,6 +208,7 @@ public class Device implements Parcelable, Cloneable {
         dest.writeInt(display ? 1 : 0);
         dest.writeInt(connect ? 1 : 0);
         dest.writeInt(type);
+        dest.writeInt(config ? 1 : 0);
     }
 
     protected Device(Parcel in){
@@ -211,6 +222,7 @@ public class Device implements Parcelable, Cloneable {
         display = in.readInt() == 1;
         connect = in.readInt() == 1;
         type = in.readInt();
+        config = in.readInt() == 1;
     }
 
     public static final Creator<Device> CREATOR = new Creator<Device>() {

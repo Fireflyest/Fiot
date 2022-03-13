@@ -2,6 +2,7 @@ package com.fireflyest.fiot.net;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.fireflyest.fiot.BaseActivity;
 import com.fireflyest.fiot.bean.Account;
 import com.google.gson.Gson;
 
@@ -30,7 +31,7 @@ public class AccountHttpRunnable implements Runnable{
         OkHttpClient client = new OkHttpClient.Builder()
                 .build();
 //        HttpUrl url = HttpUrl.get("http://www.ft0825.top/account")
-        HttpUrl url = HttpUrl.get("http://192.168.2.115:8080/account")
+        HttpUrl url = HttpUrl.get("http://"+ BaseActivity.DEBUG_URL +":8080/account")
                 .newBuilder()
                 .addQueryParameter("account", String.valueOf(account))
                 .addQueryParameter("token", token)

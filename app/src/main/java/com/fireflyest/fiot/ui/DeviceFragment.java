@@ -22,6 +22,7 @@ import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.fireflyest.fiot.BaseActivity;
 import com.fireflyest.fiot.ControlActivity;
 import com.fireflyest.fiot.HomeActivity;
 import com.fireflyest.fiot.MainActivity;
@@ -112,7 +113,7 @@ public class DeviceFragment extends Fragment {
             TextView manager = popView.findViewById(R.id.homes_manager);
             manager.setOnClickListener(vm -> {
                 Intent intent = new Intent(getContext(), HomeActivity.class);
-                intent.putExtra("home", model.getHomeData().getValue());
+                intent.putExtra(BaseActivity.EXTRA_HOME, model.getHomeData().getValue());
                 getActivity().startActivityForResult(intent, MainActivity.REQUEST_HOME);
                 popupWindow.dismiss();
             });
@@ -157,7 +158,8 @@ public class DeviceFragment extends Fragment {
             if(device.isConnect()){
                 // 已连接控制打开界面
                 Intent intent = new Intent(this.getActivity(), ControlActivity.class);
-                intent.putExtra(ControlActivity.EXTRA_DEVICE, device);
+                intent.putExtra(BaseActivity.EXTRA_DEVICE, device);
+                intent.putExtra(BaseActivity.EXTRA_HOME, model.getHomeData().getValue());
                 ActivityOptions options = ActivityOptions
                         .makeSceneTransitionAnimation(this.requireActivity(), background, "device_background");
                 this.startActivity(intent, options.toBundle());

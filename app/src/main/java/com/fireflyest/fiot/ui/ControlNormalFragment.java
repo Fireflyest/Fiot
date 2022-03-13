@@ -83,9 +83,9 @@ public class ControlNormalFragment extends Fragment {
         device = model.getDeviceData().getValue();
         if (device == null) return;
 
-        // 十六进制收发
+        // 十六进制收发 默认不是
         model.getHexData().observe(getViewLifecycleOwner(), hex -> binding.setHex(hex));
-        model.getHexData().setValue(true);
+        model.getHexData().setValue(false);
         binding.commandHex.setOnClickListener(v -> {
             boolean hex = isHex();
             model.getHexData().setValue(!hex);
@@ -120,7 +120,7 @@ public class ControlNormalFragment extends Fragment {
         binding.commandSend.setOnClickListener(v -> {
             AnimationUtils.click(v);
             String text = model.getText();
-            // todo 特征值判断
+            // 特征值判断
             if (TextUtils.isEmpty(serviceUUID) || TextUtils.isEmpty(characteristicUUID)){
                 ToastUtil.showShort(getContext(), "未配置蓝牙属性");
                 return;
@@ -135,7 +135,7 @@ public class ControlNormalFragment extends Fragment {
             Command command = new Command(0, device.getAddress(), true, false, CalendarUtil.getDate(), text, CommandType.SEND);
             commandItemAdapter.addItem(command);
             // 添加结束符
-            if(!hex) text = text + ";";
+//            if(!hex) text = text+“;”;
             // 发送指令
             BleIntentService.write(getContext(), device.getAddress(), serviceUUID, characteristicUUID,  hex ? ConvertUtil.getHexBytes(text) : text.getBytes());
             binding.commandEdit.setText("");
@@ -143,9 +143,7 @@ public class ControlNormalFragment extends Fragment {
 
         // 点击加号
         binding.commandMore.setOnClickListener(v -> {
-            AnimationUtils.click(v);
-            ToastUtil.showShort(getContext(), "more");
-            BleIntentService.readCharacteristic(getContext(), device.getAddress(), serviceUUID, characteristicUUID);
+            // TODO: 2022/3/13
         });
 
         // 更新指令
@@ -154,6 +152,7 @@ public class ControlNormalFragment extends Fragment {
             int index = model.getCommands().indexOf(command);
             if (index == -1){
                 commandItemAdapter.addItem(command);
+                binding.controlCommandList.smoothScrollToPosition(commandItemAdapter.getItemCount());
             }else {
                 commandItemAdapter.updateItem(index);
             }
@@ -196,6 +195,7 @@ public class ControlNormalFragment extends Fragment {
         // 更新蓝牙服务可选列表
         model.initServiceData(device.getAddress());
 
+        // 选择服务
         binding.controlService.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -210,7 +210,6 @@ public class ControlNormalFragment extends Fragment {
             @Override
             public void onNothingSelected(AdapterView<?> parent) { }
         });
-
         binding.controlCharacteristic.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -219,12 +218,24 @@ public class ControlNormalFragment extends Fragment {
                 String uuid = characteristic.getUuid();
                 Log.d(TAG, "SelectedCharacteristic -> " + uuid);
                 characteristicUUID = uuid;
+
+                // 3秒后隐藏服务选项
+                hideService(3000);
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) { }
         });
 
-
+        model.getEditData().observe(getViewLifecycleOwner(), display -> {
+            if(display){
+                AnimationUtils.show(binding.controlService);
+                AnimationUtils.show(binding.controlCharacteristic);
+                hideService(10000);
+            }else {
+                AnimationUtils.hide(binding.controlService);
+                AnimationUtils.hide(binding.controlCharacteristic);
+            }
+        });
     }
 
     @Override
@@ -237,6 +248,17 @@ public class ControlNormalFragment extends Fragment {
         Boolean hex = model.getHexData().getValue();
         if (hex == null) hex = false;
         return hex;
+    }
+
+    private void hideService(final long delay){
+        new Thread(() -> {
+            try {
+                Thread.sleep(delay);
+                model.getEditData().postValue(false);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
 

@@ -2,6 +2,7 @@ package com.fireflyest.fiot.net;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.fireflyest.fiot.BaseActivity;
 import com.fireflyest.fiot.bean.Home;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -34,7 +35,7 @@ public class HomeUpdateHttpRunnable implements Runnable{
         OkHttpClient client = new OkHttpClient.Builder()
                 .build();
 //        HttpUrl url = HttpUrl.get("http://www.ft0825.top/account")
-        HttpUrl url = HttpUrl.get("http://192.168.2.115:8080/updateHome")
+        HttpUrl url = HttpUrl.get("http://"+ BaseActivity.DEBUG_URL +":8080/updateHome")
                 .newBuilder()
                 .addQueryParameter("id", String.valueOf(id))
                 .addQueryParameter("key", key)

@@ -9,6 +9,7 @@ import android.view.animation.OvershootInterpolator;
 public class AnimationUtils {
 
     public static final DecelerateInterpolator decelerateInterpolator = new DecelerateInterpolator();
+    public static final OvershootInterpolator overshootInterpolator = new OvershootInterpolator();
 
     private AnimationUtils(){
     }
@@ -33,8 +34,6 @@ public class AnimationUtils {
 
                     @Override
                     public void onAnimationEnd(Animator animation) {
-//                        view.setScaleX(1);
-//                        view.setScaleY(1);
                         view.animate()
                                 .setInterpolator(decelerateInterpolator)
                                 .scaleX(1.02F)
@@ -100,7 +99,7 @@ public class AnimationUtils {
         view.animate()
                 .setInterpolator(decelerateInterpolator)
                 .alpha(0)
-                .scaleY(0)
+                .translationY(-500)
                 .setDuration(400)
                 .setListener(new AnimatorListenerAdapter() {
                     @Override
@@ -111,6 +110,26 @@ public class AnimationUtils {
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         view.setVisibility(View.GONE);
+                    }
+                });
+    }
+
+    public static void show(View view){
+        view.setVisibility(View.VISIBLE);
+        view.setTranslationY(0);
+        view.animate()
+                .setInterpolator(decelerateInterpolator)
+                .alpha(1)
+                .setDuration(400)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+                        view.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        view.setVisibility(View.VISIBLE);
                     }
                 });
     }

@@ -64,7 +64,7 @@ public class HomeActivity extends BaseActivity {
         setSupportActionBar(binding.homeToolbar);
 
         //  获取要编辑的数据
-        home = getIntent().getExtras().getParcelable("home");
+        home = getIntent().getExtras().getParcelable(BaseActivity.EXTRA_HOME);
 
         // 设置列表
         List<Setting> settingList = new ArrayList<>();

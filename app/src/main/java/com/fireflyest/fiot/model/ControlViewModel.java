@@ -31,6 +31,8 @@ public class ControlViewModel extends ViewModel {
 
     private final MutableLiveData<Boolean> hexData = new MutableLiveData<>();
 
+    private final MutableLiveData<Boolean> editData = new MutableLiveData<>();
+
     private final MutableLiveData<Command> commandData = new MutableLiveData<>();
 
     private final MutableLiveData<List<Service>> servicesData = new MutableLiveData<>();
@@ -64,10 +66,12 @@ public class ControlViewModel extends ViewModel {
                         if(TextUtils.isEmpty(data)) break;
                         Log.d(TAG, "接收到数据 -> " + data);
                         commandData.setValue(new Command(0,
-                                deviceData.getValue().getAddress(),
+                                address,
                                 false,
-                                true, CalendarUtil.getDate(),
-                                data, CommandType.RECEIVE));
+                                true,
+                                CalendarUtil.getDate(),
+                                data,
+                                CommandType.RECEIVE));
                     }
                     break;
                 case BleIntentService.ACTION_GATT_CHARACTERISTIC_WRITE_SUCCEED:
@@ -76,8 +80,10 @@ public class ControlViewModel extends ViewModel {
                         boolean success = intent.getAction().equals(BleIntentService.ACTION_GATT_CHARACTERISTIC_WRITE_SUCCEED);
                         Log.d(TAG, "写入数据反馈广播 -> " + (success ? "写入成功" : "写入失败"));
                         byte[] bytesData = intent.getByteArrayExtra(BleIntentService.EXTRA_DATA);
-                        String data = hex && bytesData != null  ? ConvertUtil.bytesToHexString(bytesData) :
-                                new String(bytesData).substring(0, bytesData.length-1);
+                        if (bytesData == null) break;
+                        String data = hex ? ConvertUtil.bytesToHexString(bytesData) :
+//                                new String(bytesData).substring(0, bytesData.length-1);
+                                new String(bytesData);
                         Log.d(TAG, "更新指令 -> " + data);
                         Command command = getCommand(data);
                         if (command == null) return;
@@ -104,6 +110,10 @@ public class ControlViewModel extends ViewModel {
 
     public MutableLiveData<Boolean> getHexData() {
         return hexData;
+    }
+
+    public MutableLiveData<Boolean> getEditData() {
+        return editData;
     }
 
     public MutableLiveData<Command> getCommandData() {
@@ -150,6 +160,7 @@ public class ControlViewModel extends ViewModel {
             s.add(se);
         }
         servicesData.setValue(s);
+        editData.setValue(true);
     }
 
     public void selectService(String serviceUuid){
