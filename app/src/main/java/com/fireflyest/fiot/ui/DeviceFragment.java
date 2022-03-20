@@ -10,15 +10,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.view.Gravity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
@@ -29,19 +26,17 @@ import com.fireflyest.fiot.MainActivity;
 import com.fireflyest.fiot.R;
 import com.fireflyest.fiot.adapter.DeviceItemAdapter;
 import com.fireflyest.fiot.anim.DeviceItemAnimator;
+import com.fireflyest.fiot.bean.Device;
 import com.fireflyest.fiot.bean.Home;
 import com.fireflyest.fiot.databinding.FragmentDeviceBinding;
 import com.fireflyest.fiot.model.MainViewModel;
 import com.fireflyest.fiot.service.BleIntentService;
 import com.fireflyest.fiot.util.AnimationUtils;
 import com.fireflyest.fiot.util.DpOrPxUtil;
-import com.fireflyest.fiot.util.ToastUtil;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DeviceFragment extends Fragment {
+
+    private static final String TAG = "DeviceFragment";
 
     private FragmentDeviceBinding binding;
     private MainViewModel model;
@@ -138,24 +133,31 @@ public class DeviceFragment extends Fragment {
 
         // 设备列表
         binding.deviceEmpty.setVisibility(View.VISIBLE);
-        // 设备更新
-        model.getDeviceData().observe(this.getViewLifecycleOwner(), device ->{
+        // 蓝牙设备更新
+        model.getBtDeviceData().observe(this.getViewLifecycleOwner(), btDevice ->{
             if(binding.deviceEmpty.getVisibility() == View.VISIBLE) {
                 AnimationUtils.hide(binding.deviceEmpty);
             }
+            Device device = new Device(btDevice);
+            deviceItemAdapter.addItem(device);
+        });
+        model.getDeviceData().observe(this.getViewLifecycleOwner(), device -> {
+            String address = device.getAddress();
             // 判断是添加还是修改
-            int index = model.getDeviceIndex(device.getAddress());
+            int index = model.getDeviceIndex(address);
             if(-1 != index){
+                Log.d(TAG, String.format("deviceItemAdapter.updateItem(%s)", index));
                 deviceItemAdapter.updateItem(index);
             }else {
                 deviceItemAdapter.addItem(device);
-                // todo 配置wifi
             }
         });
+
+
         deviceItemAdapter = new DeviceItemAdapter(view.getContext(), model.getDevices());
         // 设备点击
         deviceItemAdapter.setClickListener((device, background) -> {
-            if(device.isConnect()){
+            if(MainViewModel.getConnectState(device.getAddress()) != 0){
                 // 已连接控制打开界面
                 Intent intent = new Intent(this.getActivity(), ControlActivity.class);
                 intent.putExtra(BaseActivity.EXTRA_DEVICE, device);

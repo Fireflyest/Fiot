@@ -55,7 +55,7 @@
                     android:layout_marginStart="16dp"
                     android:textSize="20sp"
                     android:textColor="?attr/colorOnSurface"
-                    android:text="@string/device"
+                    android:text="@string/btDevice"
                     app:drawableStartCompat="@drawable/ic_add_device" />
 
             </LinearLayout>

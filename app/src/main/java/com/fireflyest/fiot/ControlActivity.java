@@ -6,15 +6,14 @@ import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.app.Activity;
-import android.app.ActivityOptions;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.fireflyest.fiot.bean.BtDevice;
 import com.fireflyest.fiot.bean.Device;
 import com.fireflyest.fiot.bean.Home;
 import com.fireflyest.fiot.data.DeviceType;
@@ -82,7 +81,7 @@ public class ControlActivity extends BaseActivity {
             binding.setDevice(device);
             
             // 收录设备初始化
-            if(!device.isConfig() && DEVICES.contains(device.getName()) && home.getWifi() != null && home.getPassword() != null){
+            if(DEVICES.contains(device.getName()) && home.getWifi() != null && home.getPassword() != null){
                 new Thread(() -> {
                     Log.d(TAG, "!device.isConfig() && DEVICES.contains(device.getName()) && home.getWifi() != null && home.getPassword() != null");
                     try { Thread.sleep(300); } catch (InterruptedException e) { e.printStackTrace();  }
@@ -96,7 +95,12 @@ public class ControlActivity extends BaseActivity {
                     try { Thread.sleep(300); } catch (InterruptedException e) { e.printStackTrace();  }
                     BleIntentService.write(ControlActivity.this, device.getAddress(), DEFAULT_SERVICE_UUID, DEFAULT_CHARACTERISTIC_UUID, (home.getPassword()+";").getBytes());
                     try { Thread.sleep(300); } catch (InterruptedException e) { e.printStackTrace();  }
+                    BleIntentService.write(ControlActivity.this, device.getAddress(), DEFAULT_SERVICE_UUID, DEFAULT_CHARACTERISTIC_UUID, "U".getBytes());
+                    try { Thread.sleep(300); } catch (InterruptedException e) { e.printStackTrace();  }
+                    BleIntentService.write(ControlActivity.this, device.getAddress(), DEFAULT_SERVICE_UUID, DEFAULT_CHARACTERISTIC_UUID, String.format("%s;", BaseActivity.DEBUG_URL).getBytes());
+                    try { Thread.sleep(300); } catch (InterruptedException e) { e.printStackTrace();  }
                     BleIntentService.write(ControlActivity.this, device.getAddress(), DEFAULT_SERVICE_UUID, DEFAULT_CHARACTERISTIC_UUID, "F".getBytes());
+
                 }).start();
             }
 
@@ -128,12 +132,6 @@ public class ControlActivity extends BaseActivity {
             model.getDeviceData().setValue(d);
         }
 
-    }
-
-    private void startConfigActivity(){
-        Intent intent = new Intent(this, ConfigActivity.class);
-        intent.putExtra(EXTRA_DEVICE, model.getDeviceData().getValue());
-        this.startActivityForResult(intent, REQUEST_CONFIG, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
     }
 
     @Override

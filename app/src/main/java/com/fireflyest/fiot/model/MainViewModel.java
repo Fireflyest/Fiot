@@ -3,11 +3,13 @@ package com.fireflyest.fiot.model;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.fireflyest.fiot.bean.Account;
+import com.fireflyest.fiot.bean.BtDevice;
 import com.fireflyest.fiot.bean.Device;
 import com.fireflyest.fiot.bean.Home;
 import com.fireflyest.fiot.net.AccountHttpRunnable;
@@ -28,6 +30,7 @@ public class MainViewModel extends ViewModel {
     private final MutableLiveData<List<Home>> homesData = new MutableLiveData<>();
 
     // 更新的设备
+    private final MutableLiveData<BtDevice> btDeviceData = new MutableLiveData<>();
     private final MutableLiveData<Device> deviceData = new MutableLiveData<>();
 
     // 账户
@@ -41,18 +44,15 @@ public class MainViewModel extends ViewModel {
         @Override
         public void onReceive(Context context, Intent intent) {
             String address = intent.getStringExtra(BleIntentService.EXTRA_ADDRESS);
+
+            Log.d(TAG, intent.getAction());
+
             int index = getDeviceIndex(address);
             if(index == -1) return;
             Device device = devices.get(index);
             switch (intent.getAction()){
                 case BleIntentService.ACTION_GATT_CONNECTED:
-                    if (device.isConnect()) return;
-                    device.setConnect(true);
-                    deviceData.setValue(device);
-                    break;
                 case BleIntentService.ACTION_GATT_CONNECT_LOSE:
-                    if (!device.isConnect()) return;
-                    device.setConnect(false);
                     deviceData.setValue(device);
                     break;
                 case BleIntentService.ACTION_DATA_AVAILABLE:
@@ -64,6 +64,12 @@ public class MainViewModel extends ViewModel {
     };
 
     public MainViewModel(){
+    }
+
+    public static int getConnectState(String address){
+        // TODO: 2022/3/20 wifi connect state
+        if(BleIntentService.isConnected(address)) return 1;
+        return 0;
     }
 
     @Override
@@ -85,6 +91,10 @@ public class MainViewModel extends ViewModel {
 
     public MutableLiveData<List<Home>> getHomesData() {
         return homesData;
+    }
+
+    public MutableLiveData<BtDevice> getBtDeviceData() {
+        return btDeviceData;
     }
 
     public MutableLiveData<Device> getDeviceData() {
@@ -131,5 +141,7 @@ public class MainViewModel extends ViewModel {
         a.setName("点击头像登录");
         accountData.setValue(a);
     }
+
+
 
 }

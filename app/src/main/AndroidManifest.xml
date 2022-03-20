@@ -21,19 +21,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Fiot"
         android:usesCleartextTraffic="true">
+
         <activity android:name=".LaunchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".HomeActivity"
-            android:windowSoftInputMode="adjustNothing"/>
+            android:windowSoftInputMode="adjustNothing" />
         <activity android:name=".LoginActivity" />
-        <activity android:name=".ConfigActivity" />
-        <activity
-            android:name=".ControlActivity" />
+        <activity android:name=".ControlActivity" />
         <activity
             android:name=".ScanActivity"
             android:label=""
@@ -41,13 +41,16 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:windowSoftInputMode="adjustNothing"
-            android:launchMode="singleTask"/>
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustNothing" />
 
         <service
             android:name=".service.BleIntentService"
             android:exported="false" />
 
+        <service
+            android:name=".service.MqttIntentService"
+            android:exported="false" />
     </application>
 
 </manifest>

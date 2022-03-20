@@ -6,16 +6,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.fireflyest.fiot.data.DeviceType;
 import com.fireflyest.fiot.R;
 import com.fireflyest.fiot.bean.Device;
 import com.fireflyest.fiot.databinding.ItemDeviceBinding;
+import com.fireflyest.fiot.model.MainViewModel;
 import com.fireflyest.fiot.util.AnimationUtils;
 
 import java.util.List;
@@ -58,6 +57,7 @@ public class DeviceItemAdapter extends RecyclerView.Adapter<DeviceItemAdapter.Vi
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final Device device = devices.get(position);
+        final String address = device.getAddress();
         Log.d(TAG, "onBindViewHolder -> " + device.toString());
         // 如果没别称，设置别称
         if(device.getNickname() == null){
@@ -66,19 +66,24 @@ public class DeviceItemAdapter extends RecyclerView.Adapter<DeviceItemAdapter.Vi
             device.setNickname(name);
         }
         holder.binding.setDevice(device);
-        if (device.isConnect()){
-            holder.binding.setDot(blueDot);
-        }else {
-            holder.binding.setDot(grayDot);
+        holder.binding.setDeviceState(address);
+        switch (MainViewModel.getConnectState(device.getAddress())){
+            case 1:
+                holder.binding.setDot(blueDot);
+                break;
+            case 2:
+                holder.binding.setDot(greenDot);
+                break;
+            default:
+                holder.binding.setDot(grayDot);
         }
 
         holder.itemView.setOnClickListener(v -> {
-            if(! device.isConnect()){
+            if(MainViewModel.getConnectState(address) == 0){
                 AnimationUtils.click(v);
             }
             if (clickListener != null) {
                 clickListener.onclick(device, holder.binding.deviceBackground);
-
             }
         });
         holder.itemView.setOnLongClickListener(v -> {
@@ -120,7 +125,7 @@ public class DeviceItemAdapter extends RecyclerView.Adapter<DeviceItemAdapter.Vi
     @Override
     public int getItemViewType(int position) {
         Device d = devices.get(position);
-        return d.getType() * (d.isConnect() ? 1 : -1);
+        return d.getType() * (MainViewModel.getConnectState(d.getAddress()) != 0 ? 1 : -1);
     }
 
     @Override

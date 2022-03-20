@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Fiot</string>
 
-    <string name="device">设备</string>
+    <string name="btDevice">设备</string>
     <string name="command">指令</string>
     <string name="mine">我的</string>
     <string name="add">添加</string>

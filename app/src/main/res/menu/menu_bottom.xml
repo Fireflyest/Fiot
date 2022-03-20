@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/menu_device"
-        android:title="@string/device"
+        android:title="@string/btDevice"
         android:icon="@drawable/ic_device"/>
 
     <item

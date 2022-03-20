@@ -34,7 +34,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:title="@{device.name}"
-            app:subtitle="@{device.desc}"
+            app:subtitle="@{device.address}"
             app:titleTextAppearance="@style/text_title"
             app:subtitleTextAppearance="@style/text_subtitle"
             app:menu="@menu/menu_control"

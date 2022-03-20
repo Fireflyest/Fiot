@@ -7,6 +7,9 @@
             name="device"
             type="com.fireflyest.fiot.bean.Device" />
         <variable
+            name="deviceState"
+            type="String" />
+        <variable
             name="dot"
             type="android.graphics.drawable.Drawable" />
     </data>
@@ -57,7 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:theme="@style/text_small"
-            android:text="@={device.desc}"/>
+            android:text="@={deviceState}"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

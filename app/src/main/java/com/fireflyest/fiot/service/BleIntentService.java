@@ -197,6 +197,10 @@ public class BleIntentService extends IntentService {
         context.startService(intent);
     }
 
+    public  static boolean isConnected(String address){
+        return gattMap.containsKey(address);
+    }
+
     public static List<BluetoothGattService> getService(String address){
         BluetoothGatt gatt = gattMap.get(address);
         if (gatt == null) {
@@ -208,7 +212,6 @@ public class BleIntentService extends IntentService {
 
     @Override
     public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
-
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -337,6 +340,7 @@ public class BleIntentService extends IntentService {
 
         gatt.readCharacteristic(gattCharacteristic);
     }
+
 
 
     /**

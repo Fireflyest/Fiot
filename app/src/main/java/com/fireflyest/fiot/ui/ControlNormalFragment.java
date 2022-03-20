@@ -20,6 +20,7 @@ import com.fireflyest.fiot.ControlActivity;
 import com.fireflyest.fiot.adapter.CharacteristicItemAdapter;
 import com.fireflyest.fiot.adapter.CommandItemAdapter;
 import com.fireflyest.fiot.adapter.ServiceItemAdapter;
+import com.fireflyest.fiot.bean.BtDevice;
 import com.fireflyest.fiot.bean.Characteristic;
 import com.fireflyest.fiot.bean.Command;
 import com.fireflyest.fiot.bean.Device;

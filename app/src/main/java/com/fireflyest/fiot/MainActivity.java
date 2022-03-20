@@ -15,16 +15,14 @@ import android.util.Log;
 import android.view.MenuItem;
 
 import com.fireflyest.fiot.adapter.ViewPagerAdapter;
-import com.fireflyest.fiot.bean.Device;
+import com.fireflyest.fiot.bean.BtDevice;
 import com.fireflyest.fiot.bean.Home;
-import com.fireflyest.fiot.data.DeviceType;
 import com.fireflyest.fiot.databinding.ActivityMainBinding;
 import com.fireflyest.fiot.dialog.VagueDialog;
 import com.fireflyest.fiot.model.MainViewModel;
 import com.fireflyest.fiot.service.BleIntentService;
 import com.fireflyest.fiot.ui.DeviceFragment;
 import com.fireflyest.fiot.ui.MineFragment;
-import com.fireflyest.fiot.util.CalendarUtil;
 import com.fireflyest.fiot.util.StatusBarUtil;
 import com.fireflyest.fiot.util.ToastUtil;
 
@@ -166,9 +164,8 @@ public class MainActivity extends BaseActivity {
                     ToastUtil.showShort(this, "设备已存在");
                     break;
                 }
-                Device device = new Device(0, name, address, true, DeviceType.NON, CalendarUtil.getDate());
-                device.setDesc(address);
-                model.getDeviceData().setValue(device);
+                BtDevice btDevice = new BtDevice(0, name, address);
+                model.getBtDeviceData().setValue(btDevice);
                 break;
             case REQUEST_HOME:
                 if (resultCode != Activity.RESULT_OK) return;
