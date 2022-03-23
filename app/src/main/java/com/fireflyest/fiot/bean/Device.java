@@ -3,6 +3,8 @@ package com.fireflyest.fiot.bean;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.fireflyest.fiot.data.DeviceType;
+
 public class Device implements Parcelable {
 
     private long id;
@@ -39,6 +41,7 @@ public class Device implements Parcelable {
         this.name = btDevice.getName();
         this.nickname = btDevice.getName();
         this.address = btDevice.getAddress();
+        this.type = DeviceType.NON;
     }
 
     public Device() {
@@ -100,6 +103,18 @@ public class Device implements Parcelable {
         this.type = type;
     }
 
+    @Override
+    public String toString() {
+        return "Device{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", owner=" + owner +
+                ", address='" + address + '\'' +
+                ", room='" + room + '\'' +
+                ", type=" + type +
+                '}';
+    }
 
     @Override
     public int describeContents() {

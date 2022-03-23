@@ -26,10 +26,13 @@ import com.fireflyest.fiot.MainActivity;
 import com.fireflyest.fiot.R;
 import com.fireflyest.fiot.adapter.DeviceItemAdapter;
 import com.fireflyest.fiot.anim.DeviceItemAnimator;
+import com.fireflyest.fiot.bean.Account;
 import com.fireflyest.fiot.bean.Device;
 import com.fireflyest.fiot.bean.Home;
+import com.fireflyest.fiot.data.DeviceType;
 import com.fireflyest.fiot.databinding.FragmentDeviceBinding;
 import com.fireflyest.fiot.model.MainViewModel;
+import com.fireflyest.fiot.net.DeviceCreateHttpRunnable;
 import com.fireflyest.fiot.service.BleIntentService;
 import com.fireflyest.fiot.util.AnimationUtils;
 import com.fireflyest.fiot.util.DpOrPxUtil;
@@ -139,20 +142,31 @@ public class DeviceFragment extends Fragment {
                 AnimationUtils.hide(binding.deviceEmpty);
             }
             Device device = new Device(btDevice);
+            device.setType(DeviceType.NON);
             deviceItemAdapter.addItem(device);
+            // 如果在线，存到服务器
+            Account account = model.getAccountData().getValue();
+            if (account != null) {
+                new Thread(
+                        new DeviceCreateHttpRunnable(account.getId(), device.getName(), device.getAddress(), device.getRoom(), device.getType(), model.getDeviceData())).start();
+            }
         });
+        // 设备更新
         model.getDeviceData().observe(this.getViewLifecycleOwner(), device -> {
+            if(binding.deviceEmpty.getVisibility() == View.VISIBLE) {
+                AnimationUtils.hide(binding.deviceEmpty);
+            }
+            Log.d(TAG, String.format("设备更新：%s", device.toString()));
             String address = device.getAddress();
             // 判断是添加还是修改
             int index = model.getDeviceIndex(address);
             if(-1 != index){
-                Log.d(TAG, String.format("deviceItemAdapter.updateItem(%s)", index));
+                model.getDevices().set(index, device);
                 deviceItemAdapter.updateItem(index);
             }else {
                 deviceItemAdapter.addItem(device);
             }
         });
-
 
         deviceItemAdapter = new DeviceItemAdapter(view.getContext(), model.getDevices());
         // 设备点击

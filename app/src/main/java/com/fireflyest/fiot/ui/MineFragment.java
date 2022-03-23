@@ -26,6 +26,7 @@ import com.fireflyest.fiot.bean.Account;
 import com.fireflyest.fiot.bean.Line;
 import com.fireflyest.fiot.databinding.FragmentMineBinding;
 import com.fireflyest.fiot.model.MainViewModel;
+import com.fireflyest.fiot.net.DevicesHttpRunnable;
 import com.fireflyest.fiot.net.HomeCreateHttpRunnable;
 import com.fireflyest.fiot.net.HomesHttpRunnable;
 import com.fireflyest.fiot.util.PreferencesUtils;
@@ -121,7 +122,7 @@ public class MineFragment extends Fragment {
             // 初始化家列表
             new Thread(new HomesHttpRunnable(account.getId(), model.getHomesData())).start();
             // 更新设备列表
-
+            new Thread(new DevicesHttpRunnable(account.getId(), model.getDeviceData())).start();
         });
 
         // 初始化账户

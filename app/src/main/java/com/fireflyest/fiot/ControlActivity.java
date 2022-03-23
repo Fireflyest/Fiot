@@ -13,18 +13,20 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.fireflyest.fiot.bean.BtDevice;
 import com.fireflyest.fiot.bean.Device;
 import com.fireflyest.fiot.bean.Home;
 import com.fireflyest.fiot.data.DeviceType;
 import com.fireflyest.fiot.databinding.ActivityControlBinding;
 import com.fireflyest.fiot.model.ControlViewModel;
+import com.fireflyest.fiot.net.DeviceTypeHttpRunnable;
 import com.fireflyest.fiot.service.BleIntentService;
 import com.fireflyest.fiot.ui.ControlNormalFragment;
 import com.fireflyest.fiot.util.StatusBarUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ControlActivity extends BaseActivity {
 
@@ -42,9 +44,9 @@ public class ControlActivity extends BaseActivity {
     public static final String DEFAULT_SERVICE_UUID = "0000ffe0-0000-1000-8000-00805f9b34fb";
     public static final String DEFAULT_CHARACTERISTIC_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
 
-    public static final List<String> DEVICES = new ArrayList<String>(){
+    public static final Map<String, Integer> DEVICE_TYPE_MAP = new HashMap<String, Integer>(){
         {
-            add("WS-01");
+            put("WS-01", DeviceType.ENVIRONMENT | DeviceType.REMOTE);
         }
     };
 
@@ -79,52 +81,31 @@ public class ControlActivity extends BaseActivity {
         model.getDeviceData().observe(this, device -> {
             Log.d(TAG, device.toString());
             binding.setDevice(device);
-            
-            // 收录设备初始化
-            if(DEVICES.contains(device.getName()) && home.getWifi() != null && home.getPassword() != null){
-                new Thread(() -> {
-                    Log.d(TAG, "!device.isConfig() && DEVICES.contains(device.getName()) && home.getWifi() != null && home.getPassword() != null");
-                    try { Thread.sleep(300); } catch (InterruptedException e) { e.printStackTrace();  }
-                    BleIntentService.write(ControlActivity.this, device.getAddress(), DEFAULT_SERVICE_UUID, DEFAULT_CHARACTERISTIC_UUID, ";R".getBytes());
-                    try { Thread.sleep(300); } catch (InterruptedException e) { e.printStackTrace();  }
-                    BleIntentService.write(ControlActivity.this, device.getAddress(), DEFAULT_SERVICE_UUID, DEFAULT_CHARACTERISTIC_UUID, "W".getBytes());
-                    try { Thread.sleep(300); } catch (InterruptedException e) { e.printStackTrace();  }
-                    BleIntentService.write(ControlActivity.this, device.getAddress(), DEFAULT_SERVICE_UUID, DEFAULT_CHARACTERISTIC_UUID, (home.getWifi()+";").getBytes());
-                    try { Thread.sleep(300); } catch (InterruptedException e) { e.printStackTrace();  }
-                    BleIntentService.write(ControlActivity.this, device.getAddress(), DEFAULT_SERVICE_UUID, DEFAULT_CHARACTERISTIC_UUID, "P".getBytes());
-                    try { Thread.sleep(300); } catch (InterruptedException e) { e.printStackTrace();  }
-                    BleIntentService.write(ControlActivity.this, device.getAddress(), DEFAULT_SERVICE_UUID, DEFAULT_CHARACTERISTIC_UUID, (home.getPassword()+";").getBytes());
-                    try { Thread.sleep(300); } catch (InterruptedException e) { e.printStackTrace();  }
-                    BleIntentService.write(ControlActivity.this, device.getAddress(), DEFAULT_SERVICE_UUID, DEFAULT_CHARACTERISTIC_UUID, "U".getBytes());
-                    try { Thread.sleep(300); } catch (InterruptedException e) { e.printStackTrace();  }
-                    BleIntentService.write(ControlActivity.this, device.getAddress(), DEFAULT_SERVICE_UUID, DEFAULT_CHARACTERISTIC_UUID, String.format("%s;", BaseActivity.DEBUG_URL).getBytes());
-                    try { Thread.sleep(300); } catch (InterruptedException e) { e.printStackTrace();  }
-                    BleIntentService.write(ControlActivity.this, device.getAddress(), DEFAULT_SERVICE_UUID, DEFAULT_CHARACTERISTIC_UUID, "F".getBytes());
 
-                }).start();
+            // 收录设备初始化
+            if(DEVICE_TYPE_MAP.containsKey(device.getName()) &&
+                    home.getWifi() != null &&
+                    home.getPassword() != null &&
+                    device.getType() == DeviceType.NON){
+                Log.d(TAG, "初始化设备");
+                this.initDevice(device, DEVICE_TYPE_MAP.get(device.getName()));
             }
 
             // 根据设备类型切换布局
-            switch (device.getType()){
-                case DeviceType.NON:
-//                    this.startConfigActivity();
-//                    break;
-                case DeviceType.LOCAL:
-                case DeviceType.REMOTE:
-                default:
-                    // 默认使用蓝牙传输
-                    this.getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.control_fragment, new ControlNormalFragment())
-                            .commit();
-                    break;
-                case DeviceType.ENVIRONMENT:
-                    // TODO: 2021/4/30
+            Log.d(TAG, String.format("设备类型%s", device.getType()));
+            if(device.getType() == DeviceType.NON){
+                // 默认使用蓝牙传输
+                Log.d(TAG, "打开蓝牙传输界面");
+                this.getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.control_fragment, new ControlNormalFragment())
+                        .commit();
+            }else{
 
-                    break;
             }
         });
 
+        // 获取主界面传输的数据
         Intent intent = getIntent();
         home = intent.getParcelableExtra(EXTRA_HOME);
         Device d = intent.getParcelableExtra(EXTRA_DEVICE);
@@ -168,6 +149,42 @@ public class ControlActivity extends BaseActivity {
     protected void onDestroy() {
         model.getCommands().clear();
         super.onDestroy();
+    }
+
+    private void initDevice(Device device, int type){
+        Log.d(TAG, "test0");
+        if(device.getId() == 0) return;
+        Log.d(TAG, "test1");
+        // 配置设备类型
+        new Thread(new DeviceTypeHttpRunnable(device.getId(), type, model.getDeviceData())).start();
+        // 初始化设备
+        new Thread(() -> {
+            String address = device.getAddress();
+            writeData(address, ";R".getBytes());
+            writeData(address, "W".getBytes());
+            writeData(address, (home.getWifi()+";").getBytes());
+            writeData(address, "P".getBytes());
+            writeData(address, (home.getPassword()+";").getBytes());
+            writeData(address, "U".getBytes());
+            writeData(address, String.format("%s;", BaseActivity.DEBUG_URL).getBytes());
+            writeData(address, "T".getBytes());
+            writeData(address, String.format("/H%s/D%s;", home.getId(), device.getId()).getBytes());
+            writeData(address, "F".getBytes());
+            writeData(address, "F".getBytes());
+            writeData(address, "F".getBytes());
+            writeData(address, "F".getBytes());
+            writeData(address, "F".getBytes());
+            writeData(address, "F".getBytes());
+        }).start();
+    }
+
+    private void writeData(String address, byte[] data){
+        BleIntentService.write(ControlActivity.this, address, DEFAULT_SERVICE_UUID, DEFAULT_CHARACTERISTIC_UUID, data);
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 }
