@@ -53,4 +53,5 @@
     <string name="none">空白</string>
     <string name="empty">( :\n暂无智能设备</string>
     <string name="upload">上传</string>
+    <string name="init">设备正在初始化…</string>
 </resources>

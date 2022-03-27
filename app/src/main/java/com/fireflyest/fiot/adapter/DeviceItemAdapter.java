@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.fireflyest.fiot.R;
 import com.fireflyest.fiot.bean.Device;
+import com.fireflyest.fiot.data.DeviceType;
 import com.fireflyest.fiot.databinding.ItemDeviceBinding;
 import com.fireflyest.fiot.model.MainViewModel;
 import com.fireflyest.fiot.util.AnimationUtils;
@@ -65,8 +66,13 @@ public class DeviceItemAdapter extends RecyclerView.Adapter<DeviceItemAdapter.Vi
             if(name != null && name.length() > 15) name = String.format("%s...", name.substring(0, 13));
             device.setNickname(name);
         }
+        // 展示设备
         holder.binding.setDevice(device);
-        holder.binding.setDeviceState(address);
+        // 设备信息
+        if(device.getType() == DeviceType.NON){
+            holder.binding.setDeviceState(address);
+        }
+        // 连接状态
         switch (MainViewModel.getConnectState(device.getAddress())){
             case 1:
                 holder.binding.setDot(blueDot);
@@ -77,7 +83,7 @@ public class DeviceItemAdapter extends RecyclerView.Adapter<DeviceItemAdapter.Vi
             default:
                 holder.binding.setDot(grayDot);
         }
-
+        // 点击
         holder.itemView.setOnClickListener(v -> {
             if(MainViewModel.getConnectState(address) == 0){
                 AnimationUtils.click(v);
@@ -86,6 +92,7 @@ public class DeviceItemAdapter extends RecyclerView.Adapter<DeviceItemAdapter.Vi
                 clickListener.onclick(device, holder.binding.deviceBackground);
             }
         });
+        // 长按
         holder.itemView.setOnLongClickListener(v -> {
             if (longClickListener != null) {
                 longClickListener.onLongClick(device);

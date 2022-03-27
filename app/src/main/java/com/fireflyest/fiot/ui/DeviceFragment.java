@@ -33,7 +33,9 @@ import com.fireflyest.fiot.data.DeviceType;
 import com.fireflyest.fiot.databinding.FragmentDeviceBinding;
 import com.fireflyest.fiot.model.MainViewModel;
 import com.fireflyest.fiot.net.DeviceCreateHttpRunnable;
+import com.fireflyest.fiot.net.DevicesHttpRunnable;
 import com.fireflyest.fiot.service.BleIntentService;
+import com.fireflyest.fiot.service.MqttIntentService;
 import com.fireflyest.fiot.util.AnimationUtils;
 import com.fireflyest.fiot.util.DpOrPxUtil;
 
@@ -71,7 +73,16 @@ public class DeviceFragment extends Fragment {
         // toolbar 更新
         model.getTemperatureData().observe(this.getViewLifecycleOwner(), temperature -> binding.setTemperature(temperature));
         model.getHumidityData().observe(this.getViewLifecycleOwner(), humidity -> binding.setHumidity(humidity));
-        model.getHomeData().observe(this.getViewLifecycleOwner(), home -> binding.setHome(home));
+        model.getHomeData().observe(this.getViewLifecycleOwner(), home -> {
+            binding.setHome(home);
+            // 连接mqtt服务器
+            // TODO: 2022/3/23 参数
+            Account account = model.getAccountData().getValue();
+            if(home == null || home.getId() == 0 || account == null) return;
+            MqttIntentService.createClient(getContext(), String.format("H%s", home.getId()), String.valueOf(home.getOwner()), "password");
+            // 设备列表
+            new Thread(new DevicesHttpRunnable(account.getId(), home.getId(), model.getDeviceData())).start();
+        });
 
         // 房间更新
         binding.roomSelect.setTextArray("全部");
@@ -146,9 +157,11 @@ public class DeviceFragment extends Fragment {
             deviceItemAdapter.addItem(device);
             // 如果在线，存到服务器
             Account account = model.getAccountData().getValue();
-            if (account != null) {
+            Home home = model.getHomeData().getValue();
+            if (account != null && home != null && home.getId() != 0) {
+                Log.d(TAG, "账户：" + account.getId() + " 家：" + home.getId());
                 new Thread(
-                        new DeviceCreateHttpRunnable(account.getId(), device.getName(), device.getAddress(), device.getRoom(), device.getType(), model.getDeviceData())).start();
+                        new DeviceCreateHttpRunnable(account.getId(), home.getId(), device.getName(), device.getAddress(), device.getRoom(), device.getType(), model.getDeviceData())).start();
             }
         });
         // 设备更新
@@ -165,12 +178,15 @@ public class DeviceFragment extends Fragment {
                 deviceItemAdapter.updateItem(index);
             }else {
                 deviceItemAdapter.addItem(device);
+                // mqtt订阅
+                MqttIntentService.subscribe(getContext(), device.getAddress());
             }
         });
 
         deviceItemAdapter = new DeviceItemAdapter(view.getContext(), model.getDevices());
         // 设备点击
         deviceItemAdapter.setClickListener((device, background) -> {
+            // 如果蓝牙已连接或是网络设备，打开
             if(MainViewModel.getConnectState(device.getAddress()) != 0){
                 // 已连接控制打开界面
                 Intent intent = new Intent(this.getActivity(), ControlActivity.class);
@@ -178,9 +194,12 @@ public class DeviceFragment extends Fragment {
                 intent.putExtra(BaseActivity.EXTRA_HOME, model.getHomeData().getValue());
                 ActivityOptions options = ActivityOptions
                         .makeSceneTransitionAnimation(this.requireActivity(), background, "device_background");
-                this.startActivity(intent, options.toBundle());
+                this.startActivityForResult(intent, MainActivity.REQUEST_CONTROL, options.toBundle());
+            }else if((device.getType() & DeviceType.REMOTE) != 0){
+                // 刷新设备网络状态
+                MqttIntentService.send(getContext(), device.getAddress(), "?");
             }else {
-                // 未连接就先连接
+                // 尝试蓝牙连接
                 BleIntentService.connect(getContext(), device.getAddress());
             }
         });

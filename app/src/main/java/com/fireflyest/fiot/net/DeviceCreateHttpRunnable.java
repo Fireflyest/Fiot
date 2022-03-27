@@ -20,14 +20,16 @@ import okhttp3.ResponseBody;
 public class DeviceCreateHttpRunnable implements Runnable{
     
     private final long owner;
+    private final long home;
     private final String name;
     private final String address;
     private final String room;
     private final int type;
     private final MutableLiveData<Device> data;
 
-    public DeviceCreateHttpRunnable(long owner, String name, String address, String room, int type, MutableLiveData<Device> data) {
+    public DeviceCreateHttpRunnable(long owner, long home, String name, String address, String room, int type, MutableLiveData<Device> data) {
         this.owner = owner;
+        this.home = home;
         this.name = name;
         this.address = address;
         this.room = room;
@@ -43,6 +45,7 @@ public class DeviceCreateHttpRunnable implements Runnable{
         HttpUrl url = HttpUrl.get("http://"+ BaseActivity.DEBUG_URL +":8080/createDevice")
                 .newBuilder()
                 .addQueryParameter("owner", String.valueOf(owner))
+                .addQueryParameter("home", String.valueOf(home))
                 .addQueryParameter("name", name)
                 .addQueryParameter("address", address)
                 .addQueryParameter("room", room)

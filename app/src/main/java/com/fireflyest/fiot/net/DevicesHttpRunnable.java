@@ -22,10 +22,12 @@ import okhttp3.ResponseBody;
 public class DevicesHttpRunnable implements Runnable{
 
     private final long owner;
+    private final long home;
     private final MutableLiveData<Device> data;
 
-    public DevicesHttpRunnable(long owner, MutableLiveData<Device> data) {
+    public DevicesHttpRunnable(long owner, long home, MutableLiveData<Device> data) {
         this.owner = owner;
+        this.home = home;
         this.data = data;
     }
 
@@ -37,6 +39,7 @@ public class DevicesHttpRunnable implements Runnable{
         HttpUrl url = HttpUrl.get("http://"+ BaseActivity.DEBUG_URL +":8080/devices")
                 .newBuilder()
                 .addQueryParameter("owner", String.valueOf(owner))
+                .addQueryParameter("home", String.valueOf(home))
                 .build();
         Request request = new Request.Builder()
                 .url(url)

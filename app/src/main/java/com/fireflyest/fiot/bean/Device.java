@@ -17,6 +17,7 @@ public class Device implements Parcelable {
 
     // 归属
     private long owner;
+    private long home;
 
     // 设备蓝牙地址，用于判断设备是否重复
     private String address;
@@ -27,11 +28,12 @@ public class Device implements Parcelable {
     // 类型
     private int type;
 
-    public Device(long id, String name, long owner, String address, String room, int type) {
+    public Device(long id, String name, long owner, long home, String address, String room, int type) {
         this.id = id;
         this.name = name;
         this.nickname = name;
         this.owner = owner;
+        this.home = home;
         this.address = address;
         this.room = room;
         this.type = type;
@@ -79,6 +81,14 @@ public class Device implements Parcelable {
         this.owner = owner;
     }
 
+    public long getHome() {
+        return home;
+    }
+
+    public void setHome(long home) {
+        this.home = home;
+    }
+
     public String getAddress() {
         return address;
     }
@@ -110,6 +120,7 @@ public class Device implements Parcelable {
                 ", name='" + name + '\'' +
                 ", nickname='" + nickname + '\'' +
                 ", owner=" + owner +
+                ", home=" + home +
                 ", address='" + address + '\'' +
                 ", room='" + room + '\'' +
                 ", type=" + type +
@@ -126,6 +137,8 @@ public class Device implements Parcelable {
         dest.writeLong(id);
         dest.writeString(name);
         dest.writeString(nickname);
+        dest.writeLong(owner);
+        dest.writeLong(home);
         dest.writeString(address);
         dest.writeString(room);
         dest.writeInt(type);
@@ -135,6 +148,8 @@ public class Device implements Parcelable {
         id = in.readLong();
         name = in.readString();
         nickname = in.readString();
+        owner = in.readLong();
+        home = in.readLong();
         address = in.readString();
         room = in.readString();
         type = in.readInt();

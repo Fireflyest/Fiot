@@ -20,12 +20,12 @@ import com.fireflyest.fiot.databinding.ActivityControlBinding;
 import com.fireflyest.fiot.model.ControlViewModel;
 import com.fireflyest.fiot.net.DeviceTypeHttpRunnable;
 import com.fireflyest.fiot.service.BleIntentService;
+import com.fireflyest.fiot.ui.ControlInitialFragment;
 import com.fireflyest.fiot.ui.ControlNormalFragment;
 import com.fireflyest.fiot.util.StatusBarUtil;
+import com.fireflyest.fiot.util.ToastUtil;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class ControlActivity extends BaseActivity {
@@ -94,14 +94,17 @@ public class ControlActivity extends BaseActivity {
             // 根据设备类型切换布局
             Log.d(TAG, String.format("设备类型%s", device.getType()));
             if(device.getType() == DeviceType.NON){
-                // 默认使用蓝牙传输
+                this.getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.control_fragment, new ControlInitialFragment())
+                        .commit();
+            }else{
+                // 默认蓝牙传输
                 Log.d(TAG, "打开蓝牙传输界面");
                 this.getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.control_fragment, new ControlNormalFragment())
                         .commit();
-            }else{
-
             }
         });
 
@@ -146,29 +149,47 @@ public class ControlActivity extends BaseActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        this.back();
+    }
+
+    @Override
     protected void onDestroy() {
         model.getCommands().clear();
         super.onDestroy();
     }
 
+    private void back(){
+        Intent intent = new Intent();
+        Device device = model.getDeviceData().getValue();
+        intent.putExtra(BaseActivity.EXTRA_DEVICE, device);
+        setResult(Activity.RESULT_OK, intent);
+        this.finishAfterTransition();
+    }
+
     private void initDevice(Device device, int type){
-        Log.d(TAG, "test0");
         if(device.getId() == 0) return;
-        Log.d(TAG, "test1");
+        ToastUtil.showLong(this, "正在初始化设备...");
         // 配置设备类型
+        device.setType(type);
         new Thread(new DeviceTypeHttpRunnable(device.getId(), type, model.getDeviceData())).start();
         // 初始化设备
         new Thread(() -> {
             String address = device.getAddress();
             writeData(address, ";R".getBytes());
             writeData(address, "W".getBytes());
-            writeData(address, (home.getWifi()+";").getBytes());
+            writeData(address, home.getWifi().getBytes());
+            writeData(address, ";".getBytes());
             writeData(address, "P".getBytes());
-            writeData(address, (home.getPassword()+";").getBytes());
+            writeData(address, home.getPassword().getBytes());
+            writeData(address, ";".getBytes());
             writeData(address, "U".getBytes());
-            writeData(address, String.format("%s;", BaseActivity.DEBUG_URL).getBytes());
+            writeData(address, String.format("%s", BaseActivity.DEBUG_URL).getBytes());
+            writeData(address, ";".getBytes());
             writeData(address, "T".getBytes());
-            writeData(address, String.format("/H%s/D%s;", home.getId(), device.getId()).getBytes());
+            writeData(address, String.format("H%s/%s", home.getId(), device.getAddress()).getBytes());
+            writeData(address, ";".getBytes());
+            writeData(address, "F".getBytes());
             writeData(address, "F".getBytes());
             writeData(address, "F".getBytes());
             writeData(address, "F".getBytes());

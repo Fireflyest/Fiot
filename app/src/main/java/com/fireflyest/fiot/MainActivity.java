@@ -16,11 +16,13 @@ import android.view.MenuItem;
 
 import com.fireflyest.fiot.adapter.ViewPagerAdapter;
 import com.fireflyest.fiot.bean.BtDevice;
+import com.fireflyest.fiot.bean.Device;
 import com.fireflyest.fiot.bean.Home;
 import com.fireflyest.fiot.databinding.ActivityMainBinding;
 import com.fireflyest.fiot.dialog.VagueDialog;
 import com.fireflyest.fiot.model.MainViewModel;
 import com.fireflyest.fiot.service.BleIntentService;
+import com.fireflyest.fiot.service.MqttIntentService;
 import com.fireflyest.fiot.ui.DeviceFragment;
 import com.fireflyest.fiot.ui.MineFragment;
 import com.fireflyest.fiot.util.StatusBarUtil;
@@ -33,6 +35,8 @@ public class MainActivity extends BaseActivity {
 
     public static final int REQUEST_BLUETOOTH = 1;
     public static final int REQUEST_HOME = 2;
+    public static final int REQUEST_CONTROL = 3;
+
     public static final String TAG = MainActivity.class.getSimpleName();
 
     private ActivityMainBinding binding;
@@ -53,7 +57,9 @@ public class MainActivity extends BaseActivity {
         super.registerBroadcastReceiver(receiver,
                 BleIntentService.ACTION_DATA_AVAILABLE,
                 BleIntentService.ACTION_GATT_CONNECTED,
-                BleIntentService.ACTION_GATT_CONNECT_LOSE);
+                BleIntentService.ACTION_GATT_CONNECT_LOSE,
+                MqttIntentService.ACTION_RECEIVER
+        );
 
         model.initData();
     }
@@ -169,8 +175,13 @@ public class MainActivity extends BaseActivity {
                 break;
             case REQUEST_HOME:
                 if (resultCode != Activity.RESULT_OK) return;
-                Home home = data.getParcelableExtra("home");
+                Home home = data.getParcelableExtra(BaseActivity.EXTRA_HOME);
                 model.getHomeData().setValue(home);
+                break;
+            case REQUEST_CONTROL:
+                if (resultCode != Activity.RESULT_OK) return;
+                Device device = data.getParcelableExtra(BaseActivity.EXTRA_DEVICE);
+                model.getDeviceData().setValue(device);
                 break;
             default:
         }

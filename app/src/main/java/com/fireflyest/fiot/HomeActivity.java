@@ -130,7 +130,7 @@ public class HomeActivity extends BaseActivity {
     private void back(){
         Intent intent = new Intent();
         if (flag) {
-            intent.putExtra("home", home);
+            intent.putExtra(BaseActivity.EXTRA_HOME, home);
             this.setResult(RESULT_OK, intent);
         }else {
             this.setResult(RESULT_CANCELED);

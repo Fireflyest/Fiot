@@ -29,6 +29,7 @@ import com.fireflyest.fiot.model.MainViewModel;
 import com.fireflyest.fiot.net.DevicesHttpRunnable;
 import com.fireflyest.fiot.net.HomeCreateHttpRunnable;
 import com.fireflyest.fiot.net.HomesHttpRunnable;
+import com.fireflyest.fiot.service.MqttIntentService;
 import com.fireflyest.fiot.util.PreferencesUtils;
 import com.fireflyest.fiot.util.ToastUtil;
 
@@ -122,7 +123,7 @@ public class MineFragment extends Fragment {
             // 初始化家列表
             new Thread(new HomesHttpRunnable(account.getId(), model.getHomesData())).start();
             // 更新设备列表
-            new Thread(new DevicesHttpRunnable(account.getId(), model.getDeviceData())).start();
+//            new Thread(new DevicesHttpRunnable(account.getId(), model.getDeviceData())).start();
         });
 
         // 初始化账户
@@ -158,5 +159,11 @@ public class MineFragment extends Fragment {
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_main, menu);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        MqttIntentService.closeClient(getContext());
     }
 }

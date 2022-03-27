@@ -14,6 +14,7 @@ import com.fireflyest.fiot.bean.Device;
 import com.fireflyest.fiot.bean.Home;
 import com.fireflyest.fiot.net.AccountHttpRunnable;
 import com.fireflyest.fiot.service.BleIntentService;
+import com.fireflyest.fiot.service.MqttIntentService;
 import com.fireflyest.fiot.util.RSAUtils;
 
 import java.util.ArrayList;
@@ -43,32 +44,37 @@ public class MainViewModel extends ViewModel {
     private final BroadcastReceiver receiver =new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String address = intent.getStringExtra(BleIntentService.EXTRA_ADDRESS);
+            String address = null;
 
             Log.d(TAG, intent.getAction());
 
-            int index = getDeviceIndex(address);
-            if(index == -1) return;
-            Device device = devices.get(index);
+
             switch (intent.getAction()){
                 case BleIntentService.ACTION_GATT_CONNECTED:
                 case BleIntentService.ACTION_GATT_CONNECT_LOSE:
-                    deviceData.setValue(device);
+                    address = intent.getStringExtra(BleIntentService.EXTRA_ADDRESS);
+                    break;
+                case MqttIntentService.ACTION_RECEIVER:
+                    address = intent.getStringExtra(MqttIntentService.EXTRA_TOPIC);
                     break;
                 case BleIntentService.ACTION_DATA_AVAILABLE:
 
                     break;
                 default:
             }
+            int index = getDeviceIndex(address);
+            if(index == -1) return;
+            Device device = devices.get(index);
+            deviceData.setValue(device);
         }
     };
 
     public MainViewModel(){
     }
 
-    public static int getConnectState(String address){
-        // TODO: 2022/3/20 wifi connect state
-        if(BleIntentService.isConnected(address)) return 1;
+    public static int getConnectState(String key){
+        if(MqttIntentService.isConnected(key)) return 2;
+        if(BleIntentService.isConnected(key)) return 1;
         return 0;
     }
 
