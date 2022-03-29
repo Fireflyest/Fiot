@@ -3,6 +3,7 @@ package com.fireflyest.fiot;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.app.Activity;
@@ -82,30 +83,39 @@ public class ControlActivity extends BaseActivity {
             Log.d(TAG, device.toString());
             binding.setDevice(device);
 
-            // 收录设备初始化
-            if(DEVICE_TYPE_MAP.containsKey(device.getName()) &&
-                    home.getWifi() != null &&
-                    home.getPassword() != null &&
-                    device.getType() == DeviceType.NON){
-                Log.d(TAG, "初始化设备");
-                this.initDevice(device, DEVICE_TYPE_MAP.get(device.getName()));
+            // 首次连接设备
+            if (device.getType() == DeviceType.NON){
+                if(DEVICE_TYPE_MAP.containsKey(device.getName()) &&
+                        home.getWifi() != null &&
+                        home.getPassword() != null){                // 收录设备初始化
+                    Log.d(TAG, "初始化设备");
+                    int type = DEVICE_TYPE_MAP.get(device.getName());
+                    this.initDevice(device, type);
+                    device.setType(type);
+                }else {                                                                               // 非收录设备本地蓝牙发送
+                    device.setType(DeviceType.LOCAL);
+                }
+                // 更新页面
+                model.getDeviceData().setValue(device);
             }
+
 
             // 根据设备类型切换布局
             Log.d(TAG, String.format("设备类型%s", device.getType()));
+            Fragment fragment;
             if(device.getType() == DeviceType.NON){
-                this.getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.control_fragment, new ControlInitialFragment())
-                        .commit();
+                // 初始化界面
+                fragment = new ControlInitialFragment();
             }else{
                 // 默认蓝牙传输
                 Log.d(TAG, "打开蓝牙传输界面");
-                this.getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.control_fragment, new ControlNormalFragment())
-                        .commit();
+                fragment = new ControlNormalFragment();
             }
+            // 打开页面
+            this.getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.control_fragment, fragment)
+                    .commit();
         });
 
         // 获取主界面传输的数据
@@ -171,7 +181,6 @@ public class ControlActivity extends BaseActivity {
         if(device.getId() == 0) return;
         ToastUtil.showLong(this, "正在初始化设备...");
         // 配置设备类型
-        device.setType(type);
         new Thread(new DeviceTypeHttpRunnable(device.getId(), type, model.getDeviceData())).start();
         // 初始化设备
         new Thread(() -> {

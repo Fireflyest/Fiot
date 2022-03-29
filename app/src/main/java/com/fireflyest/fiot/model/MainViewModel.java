@@ -16,6 +16,7 @@ import com.fireflyest.fiot.net.AccountHttpRunnable;
 import com.fireflyest.fiot.service.BleIntentService;
 import com.fireflyest.fiot.service.MqttIntentService;
 import com.fireflyest.fiot.util.RSAUtils;
+import com.fireflyest.fiot.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,21 +45,36 @@ public class MainViewModel extends ViewModel {
     private final BroadcastReceiver receiver =new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String address = null;
+            String address = null, data = null;
 
             Log.d(TAG, intent.getAction());
 
 
             switch (intent.getAction()){
-                case BleIntentService.ACTION_GATT_CONNECTED:
+                case BleIntentService.ACTION_GATT_CONNECTED:                // 蓝牙设备连接状态更新
                 case BleIntentService.ACTION_GATT_CONNECT_LOSE:
                     address = intent.getStringExtra(BleIntentService.EXTRA_ADDRESS);
                     break;
-                case MqttIntentService.ACTION_RECEIVER:
+                case MqttIntentService.ACTION_DEVICE_ONLINE:                   // 网络设备上线
                     address = intent.getStringExtra(MqttIntentService.EXTRA_TOPIC);
                     break;
-                case BleIntentService.ACTION_DATA_AVAILABLE:
+                case MqttIntentService.ACTION_RECEIVER:                                // 网络数据接收
+                    data = intent.getStringExtra(MqttIntentService.EXTRA_DATA);
+                    if(data.contains("=")){
+                        String[] kv = data.split("=");
+                        switch (kv[0]){
+                            case "temp": // 温度
+                                temperatureData.setValue(kv[1]);
+                                break;
+                            case "humi": // 湿度
+                                humidityData.setValue(kv[1]);
+                                break;
+                            default:
+                        }
+                    }
 
+                    break;
+                case BleIntentService.ACTION_DATA_AVAILABLE:                        // 蓝牙数据接收
                     break;
                 default:
             }
@@ -136,9 +152,6 @@ public class MainViewModel extends ViewModel {
     }
 
     public void initData(){
-        temperatureData.setValue("X");
-        humidityData.setValue("X");
-
         Home h = new Home();
         h.setName("我的家");
         homeData.setValue(h);

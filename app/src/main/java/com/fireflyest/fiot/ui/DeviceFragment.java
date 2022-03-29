@@ -70,9 +70,18 @@ public class DeviceFragment extends Fragment {
         if (activity != null) activity.setSupportActionBar(binding.deviceToolbar);
         this.setHasOptionsMenu(true);
 
+        // 温湿度
+        model.getTemperatureData().observe(this.getViewLifecycleOwner(), temperature -> {
+            binding.mainTemperatureIcon.setVisibility(View.VISIBLE);
+            binding.mainTemperatureValue.setVisibility(View.VISIBLE);
+            binding.setTemperature(temperature);
+        });
+        model.getHumidityData().observe(this.getViewLifecycleOwner(), humidity -> {
+            binding.mainHumidityIcon.setVisibility(View.VISIBLE);
+            binding.mainHumidityValue.setVisibility(View.VISIBLE);
+            binding.setHumidity(humidity);
+        });
         // toolbar 更新
-        model.getTemperatureData().observe(this.getViewLifecycleOwner(), temperature -> binding.setTemperature(temperature));
-        model.getHumidityData().observe(this.getViewLifecycleOwner(), humidity -> binding.setHumidity(humidity));
         model.getHomeData().observe(this.getViewLifecycleOwner(), home -> {
             binding.setHome(home);
             // 连接mqtt服务器
@@ -87,6 +96,7 @@ public class DeviceFragment extends Fragment {
         // 房间更新
         binding.roomSelect.setTextArray("全部");
         // 环境
+
 
         // toolbar动画
         binding.deviceToolbar.setTitle("");

@@ -22,7 +22,7 @@ public class MqttIntentService extends IntentService {
     private static final String TAG = "MqttIntentService";
 
     private static MqttClient mqttClient;
-    private static String topicStart;
+    private static String topicMain;
     private static final HashMap<String, Boolean> deviceStateMap = new HashMap<>();
     private static final MqttConnectOptions connectOptions = new MqttConnectOptions();
     private static final MemoryPersistence persistence = new MemoryPersistence();
@@ -34,6 +34,7 @@ public class MqttIntentService extends IntentService {
     public static final String ACTION_CLOSE = "com.fireflyest.fiot.service.action.CLOSE";
     public static final String ACTION_SEND = "com.fireflyest.fiot.service.action.SEND";
     public static final String ACTION_CONNECT_LOST = "com.fireflyest.fiot.service.action.CONNECT_LOST";
+    public static final String ACTION_DEVICE_ONLINE = "com.fireflyest.fiot.service.action.DEVICE_ONLINE";
     public static final String ACTION_SEND_SUCCESS = "com.fireflyest.fiot.service.action.SEND_SUCCESS";
     public static final String ACTION_SEND_FAIL = "com.fireflyest.fiot.service.action.SEND_FAIL";
     public static final String ACTION_RECEIVER = "com.fireflyest.fiot.service.action.RECEIVER";
@@ -61,13 +62,17 @@ public class MqttIntentService extends IntentService {
         }
 
         @Override
-        public void messageArrived(String topic, MqttMessage message) throws Exception {
+        public void messageArrived(String topic, MqttMessage message) {
             String data = new String(message.getPayload());
             Log.d(TAG, topic+"接收到信息：" + data);
             String address = topic.split("/")[1];
-            if("OK".equals(data)){
+            // 设置为在线
+            if(!deviceStateMap.containsKey(address) || !deviceStateMap.get(address)){
+                Log.d(TAG, topic+"设备上线");
                 deviceStateMap.put(address, true);
+                broadcastUpdate(ACTION_DEVICE_ONLINE, address);
             }
+            // 广播数据
             broadcastDataAction(ACTION_RECEIVER, address, data);
         }
 
@@ -174,7 +179,7 @@ public class MqttIntentService extends IntentService {
     }
 
     private void handleActionSend(String topic, String data) {
-        String deviceTopic = String.format("%s/%s", topicStart, topic);
+        String deviceTopic = String.format("%s/%s", topicMain, topic);
         // 创建消息
         MqttMessage message = new MqttMessage(data.getBytes());
         // 设置消息的服务质量
@@ -198,8 +203,8 @@ public class MqttIntentService extends IntentService {
 
     private void handleActionCreate(String clientId, String username, String password) throws MqttException {
         // 判断是否已经连接过
-        if (clientId.equals(topicStart)) return;
-        topicStart = clientId;
+        if (clientId.equals(topicMain)) return;
+        topicMain = clientId;
         // 创建客户端
         String url = String.format("tcp://%s:1883", BaseActivity.DEBUG_URL);
         Log.d(TAG, clientId + " 连接服务器 " + url);
@@ -224,7 +229,7 @@ public class MqttIntentService extends IntentService {
 
 
     private void handleActionSubscribe(String topic) throws MqttException {
-        String deviceTopic = String.format("%s/%s", topicStart, topic);
+        String deviceTopic = String.format("%s/%s", topicMain, topic);
 
         if (mqttClient == null) {
             return;
@@ -237,7 +242,7 @@ public class MqttIntentService extends IntentService {
     }
 
     private void handleActionUnsubscribe(String topic) throws MqttException {
-        String deviceTopic = String.format("%s/%s", topicStart, topic);
+        String deviceTopic = String.format("%s/%s", topicMain, topic);
 
         if (mqttClient == null) {
             return;
@@ -252,7 +257,11 @@ public class MqttIntentService extends IntentService {
      * @param action 标记
      */
     private void broadcastUpdate(String action){
-        broadcastDataAction(action, "", "");
+        broadcastUpdate(action, "");
+    }
+
+    private void broadcastUpdate(String action, String topic){
+        broadcastDataAction(action, topic, "");
     }
 
     private void broadcastDataAction(String action, String topic, String data){

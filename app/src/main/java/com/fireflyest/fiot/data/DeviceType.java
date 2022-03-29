@@ -27,7 +27,8 @@ public class DeviceType {
 
     // 音视设备(电视、音响)
     public static final int AUDIO = 0x0080;
-//    public static final int AUDIO = 0x0100;
+    // 语音助手
+    public static final int AUDIO_ASSISTANT = 0x0100;
 //    public static final int AUDIO = 0x0200;
 
     // 灯光设备

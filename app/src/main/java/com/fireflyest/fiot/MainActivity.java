@@ -58,7 +58,8 @@ public class MainActivity extends BaseActivity {
                 BleIntentService.ACTION_DATA_AVAILABLE,
                 BleIntentService.ACTION_GATT_CONNECTED,
                 BleIntentService.ACTION_GATT_CONNECT_LOSE,
-                MqttIntentService.ACTION_RECEIVER
+                MqttIntentService.ACTION_RECEIVER,
+                MqttIntentService.ACTION_DEVICE_ONLINE
         );
 
         model.initData();
