@@ -8,14 +8,14 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
-public class DeviceTypeHttpRunnable implements Runnable{
+public class DeviceNicknameHttpRunnable implements Runnable{
 
     private final long id;
-    private final int type;
+    private final String nickname;
 
-    public DeviceTypeHttpRunnable(long id, int type) {
+    public DeviceNicknameHttpRunnable(long id, String nickname) {
         this.id = id;
-        this.type = type;
+        this.nickname = nickname;
     }
 
     @Override
@@ -23,10 +23,10 @@ public class DeviceTypeHttpRunnable implements Runnable{
         OkHttpClient client = new OkHttpClient.Builder()
                 .build();
 //        HttpUrl url = HttpUrl.get("http://www.ft0825.top/account")
-        HttpUrl url = HttpUrl.get("http://"+ BaseActivity.DEBUG_URL +":8080/deviceType")
+        HttpUrl url = HttpUrl.get("http://"+ BaseActivity.DEBUG_URL +":8080/deviceNickname")
                 .newBuilder()
                 .addQueryParameter("id", String.valueOf(id))
-                .addQueryParameter("type", String.valueOf(type))
+                .addQueryParameter("nickname", nickname)
                 .build();
         Request request = new Request.Builder()
                 .url(url)

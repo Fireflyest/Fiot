@@ -1,11 +1,13 @@
 package com.fireflyest.fiot.ui;
 
 import android.app.ActivityOptions;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -16,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
@@ -33,11 +36,21 @@ import com.fireflyest.fiot.data.DeviceType;
 import com.fireflyest.fiot.databinding.FragmentDeviceBinding;
 import com.fireflyest.fiot.model.MainViewModel;
 import com.fireflyest.fiot.net.DeviceCreateHttpRunnable;
+import com.fireflyest.fiot.net.DeviceNicknameHttpRunnable;
+import com.fireflyest.fiot.net.DeviceRemoveHttpRunnable;
+import com.fireflyest.fiot.net.DeviceRoomHttpRunnable;
 import com.fireflyest.fiot.net.DevicesHttpRunnable;
 import com.fireflyest.fiot.service.BleIntentService;
 import com.fireflyest.fiot.service.MqttIntentService;
 import com.fireflyest.fiot.util.AnimationUtils;
 import com.fireflyest.fiot.util.DpOrPxUtil;
+import com.fireflyest.fiot.util.ToastUtil;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class DeviceFragment extends Fragment {
 
@@ -47,6 +60,8 @@ public class DeviceFragment extends Fragment {
     private MainViewModel model;
 
     private DeviceItemAdapter deviceItemAdapter;
+
+    private final List<String> rooms = new ArrayList<>();
 
     public DeviceFragment() {
     }
@@ -94,9 +109,8 @@ public class DeviceFragment extends Fragment {
         });
 
         // 房间更新
-        binding.roomSelect.setTextArray("全部");
-        // 环境
-
+        rooms.add("全部");
+        binding.roomSelect.setTextArray(rooms.toArray(new String[0]));
 
         // toolbar动画
         binding.deviceToolbar.setTitle("");
@@ -148,6 +162,7 @@ public class DeviceFragment extends Fragment {
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
 
             // 选择的家
+            // TODO: 2022/4/4
             TextView select = popView.findViewById(R.id.room_select);
 
             popupWindow.setTouchable(true);
@@ -191,6 +206,12 @@ public class DeviceFragment extends Fragment {
                 // mqtt订阅
                 MqttIntentService.subscribe(getContext(), device.getAddress());
             }
+            // 房间
+            // TODO: 2022/4/4
+            if(null != device.getRoom() && !rooms.contains(device.getRoom())){
+                rooms.add(device.getRoom());
+                binding.roomSelect.setTextArray(rooms.toArray(new String[0]));
+            }
         });
 
         deviceItemAdapter = new DeviceItemAdapter(view.getContext(), model.getDevices());
@@ -215,16 +236,89 @@ public class DeviceFragment extends Fragment {
         });
 
         //设备长按
-        deviceItemAdapter.setLongClickListener(device -> {
-//            int index = model.getDeviceIndex(address);
-//            if(-1 == index) return;
-//            Device d = model.getDevices().get(index);
-//            if(d.isConnect()) BluetoothIntentService.disconnect(getContext(), d.getAddress());
-//            deviceItemAdapter.removeItem(index);
+        deviceItemAdapter.setLongClickListener((device, background) -> {
+            View popView = LayoutInflater.from(getContext()).inflate(R.layout.pop_device,  binding.deviceToolbar, false);
+            final PopupWindow popupWindow = new PopupWindow(popView,
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+
+            popupWindow.setTouchable(true);
+            popupWindow.showAsDropDown(background, 0, DpOrPxUtil.dip2px(background.getContext(), -80));
+
+            // 打开
+            TextView open = popView.findViewById(R.id.device_open);
+            open.setOnClickListener(v -> {
+                popupWindow.dismiss();
+
+                Intent intent = new Intent(this.getActivity(), ControlActivity.class);
+                intent.putExtra(BaseActivity.EXTRA_DEVICE, device);
+                intent.putExtra(BaseActivity.EXTRA_HOME, model.getHomeData().getValue());
+                ActivityOptions options = ActivityOptions
+                        .makeSceneTransitionAnimation(this.requireActivity(), background, "device_background");
+                this.startActivityForResult(intent, MainActivity.REQUEST_CONTROL, options.toBundle());
+            });
+            // 移动到别的房间
+            TextView move = popView.findViewById(R.id.device_move);
+            move.setOnClickListener(v ->{
+                popupWindow.dismiss();
+                // 弹窗
+                AlertDialog moveDialog = new AlertDialog.Builder(getActivity())
+                        .setMessage("输入房间的名称")
+                        .setTitle(R.string.move)
+                        .setView(R.layout.diaog_edittext)
+                        .setPositiveButton(R.string.done, (DialogInterface.OnClickListener) (dialog, id) -> {
+                            EditText editText = ((AlertDialog)dialog).getWindow().getDecorView().findViewById(R.id.dialog_edittext);
+                            String room = editText.getText().toString();
+                            device.setRoom(room);
+                            // 网络更新
+                            new Thread(new DeviceRoomHttpRunnable(device.getId(), room)).start();
+                            // 列表更新
+                            model.getDeviceData().setValue(device);
+                        })
+                        .setNegativeButton(R.string.cancel, (DialogInterface.OnClickListener) (dialog, id) -> {
+                            dialog.cancel();
+                        })
+                        .create();
+                moveDialog.show();
+            });
+            // 备注
+            TextView nickname = popView.findViewById(R.id.device_nickname);
+            nickname.setOnClickListener(v->{
+                popupWindow.dismiss();
+                // 弹窗
+                AlertDialog nicknameDialog = new AlertDialog.Builder(getActivity())
+                        .setMessage("输入备注")
+                        .setTitle(R.string.nickname)
+                        .setView(R.layout.diaog_edittext)
+                        .setPositiveButton(R.string.done, (DialogInterface.OnClickListener) (dialog, id) -> {
+                            EditText editText = ((AlertDialog)dialog).getWindow().getDecorView().findViewById(R.id.dialog_edittext);
+                            String nick = editText.getText().toString();
+                            device.setNickname(nick);
+                            // 网络更新
+                            new Thread(new DeviceNicknameHttpRunnable(device.getId(), nick)).start();
+                            // 列表更新
+                            model.getDeviceData().setValue(device);
+                        })
+                        .setNegativeButton(R.string.cancel, (DialogInterface.OnClickListener) (dialog, id) -> {
+                            dialog.cancel();
+                        })
+                        .create();
+                nicknameDialog.show();
+            });
+            // 删除
+            TextView remove = popView.findViewById(R.id.device_remove);
+            remove.setOnClickListener(v ->{
+                popupWindow.dismiss();
+
+                int index = model.getDeviceIndex(device.getAddress());
+                BleIntentService.disconnect(getContext(), device.getAddress());
+                if (index != -1) deviceItemAdapter.removeItem(index);
+                // 网络设备删除
+                if((device.getType() & DeviceType.REMOTE) != 0){
+                    new Thread(new DeviceRemoveHttpRunnable(device.getId())).start();
+                }
+            });
         });
         binding.deviceList.setAdapter(deviceItemAdapter);
-        binding.deviceList.setItemAnimator(new DeviceItemAnimator());
-
 
     }
 

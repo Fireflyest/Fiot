@@ -15,7 +15,8 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class MqttIntentService extends IntentService {
 
@@ -23,7 +24,7 @@ public class MqttIntentService extends IntentService {
 
     private static MqttClient mqttClient;
     private static String topicMain;
-    private static final HashMap<String, Boolean> deviceStateMap = new HashMap<>();
+    private static final Set<String> deviceStateSet = new HashSet<>();
     private static final MqttConnectOptions connectOptions = new MqttConnectOptions();
     private static final MemoryPersistence persistence = new MemoryPersistence();
 
@@ -67,9 +68,9 @@ public class MqttIntentService extends IntentService {
             Log.d(TAG, topic+"接收到信息：" + data);
             String address = topic.split("/")[1];
             // 设置为在线
-            if(!deviceStateMap.containsKey(address) || !deviceStateMap.get(address)){
+            if(!deviceStateSet.contains(address)){
                 Log.d(TAG, topic+"设备上线");
-                deviceStateMap.put(address, true);
+                deviceStateSet.add(address);
                 broadcastUpdate(ACTION_DEVICE_ONLINE, address);
             }
             // 广播数据
@@ -133,8 +134,7 @@ public class MqttIntentService extends IntentService {
     }
 
     public  static boolean isConnected(String topic){
-        if(!deviceStateMap.containsKey(topic)) return false;
-        return deviceStateMap.get(topic);
+        return deviceStateSet.contains(topic);
     }
 
     @Override
@@ -144,13 +144,17 @@ public class MqttIntentService extends IntentService {
             if (ACTION_SEND.equals(action)) {
                 final String topic = intent.getStringExtra(EXTRA_TOPIC);
                 final String data = intent.getStringExtra(EXTRA_DATA);
-                handleActionSend(topic, data);
+                if (data != null) {
+                    handleActionSend(topic, data);
+                }
             }else if (ACTION_CREATE.equals(action)) {
                 final String clientId   = intent.getStringExtra(EXTRA_CLIENTID);
                 final String username = intent.getStringExtra(EXTRA_USERNAME);
                 final String password = intent.getStringExtra(EXTRA_PASSWORD);
                 try {
-                    handleActionCreate(clientId, username, password);
+                    if (clientId != null) {
+                        handleActionCreate(clientId, username, password);
+                    }
                 } catch (MqttException e) {
                     e.printStackTrace();
                 }
@@ -238,7 +242,7 @@ public class MqttIntentService extends IntentService {
 
         mqttClient.subscribe(deviceTopic, SUBSCRIBE_QOS);
 
-        deviceStateMap.put(topic, false);
+        deviceStateSet.add(topic);
     }
 
     private void handleActionUnsubscribe(String topic) throws MqttException {
@@ -249,7 +253,7 @@ public class MqttIntentService extends IntentService {
         }
 
         mqttClient.unsubscribe(deviceTopic);
-        deviceStateMap.remove(topic);
+        deviceStateSet.remove(topic);
     }
 
     /**

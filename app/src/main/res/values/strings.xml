@@ -54,4 +54,10 @@
     <string name="empty">( :\n暂无智能设备</string>
     <string name="upload">上传</string>
     <string name="init">设备正在初始化…</string>
+    <string name="open">打开</string>
+    <string name="move">移动</string>
+    <string name="nickname">备注</string>
+    <string name="remove">删除</string>
+    <string name="done">确定</string>
+    <string name="cancel">取消</string>
 </resources>

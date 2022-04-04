@@ -34,7 +34,7 @@ public class DeviceItemAdapter extends RecyclerView.Adapter<DeviceItemAdapter.Vi
         void onclick(Device device, View background);
     }
     public interface OnItemLongClickListener {
-        void onLongClick(Device device);
+        void onLongClick(Device device, View background);
     }
 
     private OnItemClickListener clickListener;
@@ -67,21 +67,18 @@ public class DeviceItemAdapter extends RecyclerView.Adapter<DeviceItemAdapter.Vi
             device.setNickname(name);
         }
         // 展示设备
-        holder.binding.setDevice(device);
-        // 设备信息
-        if(device.getType() == DeviceType.NON){
-            holder.binding.setDeviceState(address);
+        if (device.getType() == DeviceType.NON){
+            device.setState(device.getAddress());
         }
+        holder.binding.setDevice(device);
         // 连接状态
-        switch (MainViewModel.getConnectState(device.getAddress())){
-            case 1:
-                holder.binding.setDot(blueDot);
-                break;
-            case 2:
-                holder.binding.setDot(greenDot);
-                break;
-            default:
-                holder.binding.setDot(grayDot);
+        int state = MainViewModel.getConnectState(device.getAddress());
+        if(state == 1){
+            holder.binding.setDot(blueDot);
+        }else if(state == 2 && (device.getType() & DeviceType.REMOTE) != 0){
+            holder.binding.setDot(greenDot);
+        }else{
+            holder.binding.setDot(grayDot);
         }
         // 点击
         holder.itemView.setOnClickListener(v -> {
@@ -95,7 +92,7 @@ public class DeviceItemAdapter extends RecyclerView.Adapter<DeviceItemAdapter.Vi
         // 长按
         holder.itemView.setOnLongClickListener(v -> {
             if (longClickListener != null) {
-                longClickListener.onLongClick(device);
+                longClickListener.onLongClick(device, holder.binding.deviceBackground);
             }
             return true;
         });

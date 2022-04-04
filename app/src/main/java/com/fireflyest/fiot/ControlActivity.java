@@ -21,6 +21,7 @@ import com.fireflyest.fiot.databinding.ActivityControlBinding;
 import com.fireflyest.fiot.model.ControlViewModel;
 import com.fireflyest.fiot.net.DeviceTypeHttpRunnable;
 import com.fireflyest.fiot.service.BleIntentService;
+import com.fireflyest.fiot.service.MqttIntentService;
 import com.fireflyest.fiot.ui.ControlInitialFragment;
 import com.fireflyest.fiot.ui.ControlNormalFragment;
 import com.fireflyest.fiot.util.StatusBarUtil;
@@ -92,6 +93,8 @@ public class ControlActivity extends BaseActivity {
                     int type = DEVICE_TYPE_MAP.get(device.getName());
                     this.initDevice(device, type);
                     device.setType(type);
+                    // mqtt订阅
+                    MqttIntentService.subscribe(this, device.getAddress());
                 }else {                                                                               // 非收录设备本地蓝牙发送
                     device.setType(DeviceType.LOCAL);
                 }
@@ -181,7 +184,7 @@ public class ControlActivity extends BaseActivity {
         if(device.getId() == 0) return;
         ToastUtil.showLong(this, "正在初始化设备...");
         // 配置设备类型
-        new Thread(new DeviceTypeHttpRunnable(device.getId(), type, model.getDeviceData())).start();
+        new Thread(new DeviceTypeHttpRunnable(device.getId(), type)).start();
         // 初始化设备
         new Thread(() -> {
             String address = device.getAddress();

@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,8 +20,12 @@ import androidx.annotation.Nullable;
 import com.fireflyest.fiot.R;
 import com.fireflyest.fiot.util.DpOrPxUtil;
 
+import java.util.Arrays;
+
 
 public class TextSwitch extends View {
+
+    private static final String TAG = "TextSwitch";
 
     public static final int EMPTY = -1;
     public static final int IDLE = 0;
@@ -37,6 +42,7 @@ public class TextSwitch extends View {
     private float right;
     private int state = EMPTY;
     private float selectWidth = 0;
+    private int duration = 260;
 
     private SwitchChangeListener changeListener;
 
@@ -66,9 +72,13 @@ public class TextSwitch extends View {
         init(context, attrs);
     }
 
-    public void setTextArray(String... textArray){
+    public void setTextArray(String[] textArray){
         this.strings = textArray;
+        this.invalidate();
+    }
 
+    public void setDuration(int duration) {
+        this.duration = duration;
     }
 
     public void setChangeListener(SwitchChangeListener changeListener) {
@@ -99,8 +109,8 @@ public class TextSwitch extends View {
         ValueAnimator leftAnimator = ValueAnimator.ofFloat(leftStart, leftEnd);
         ValueAnimator rightAnimator = ValueAnimator.ofFloat(rightStart, rightEnd);
         if(amount < 0){
-            leftAnimator.setDuration(300);
-            rightAnimator.setDuration(150);
+            leftAnimator.setDuration(duration);
+            rightAnimator.setDuration(duration/2);
             leftAnimator.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
@@ -110,8 +120,8 @@ public class TextSwitch extends View {
                 }
             });
         }else {
-            leftAnimator.setDuration(150);
-            rightAnimator.setDuration(300);
+            leftAnimator.setDuration(duration/2);
+            rightAnimator.setDuration(duration);
             rightAnimator.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
@@ -136,6 +146,7 @@ public class TextSwitch extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        Log.d(TAG, "onDraw: " + Arrays.toString(strings));
         float width = getWidth(), height = getHeight();
 
         float start = joinWidth+1, end = joinWidth-1;

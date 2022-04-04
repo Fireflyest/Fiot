@@ -19,7 +19,9 @@ import com.fireflyest.fiot.util.RSAUtils;
 import com.fireflyest.fiot.util.ToastUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainViewModel extends ViewModel {
 
@@ -45,8 +47,9 @@ public class MainViewModel extends ViewModel {
     private final BroadcastReceiver receiver =new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            int index;
             String address = null, data = null;
-
+            Device device = null;
             Log.d(TAG, intent.getAction());
 
 
@@ -54,34 +57,51 @@ public class MainViewModel extends ViewModel {
                 case BleIntentService.ACTION_GATT_CONNECTED:                // 蓝牙设备连接状态更新
                 case BleIntentService.ACTION_GATT_CONNECT_LOSE:
                     address = intent.getStringExtra(BleIntentService.EXTRA_ADDRESS);
+                    index = getDeviceIndex(address);
+                    if(index == -1) return;
+                    device = devices.get(index);
                     break;
                 case MqttIntentService.ACTION_DEVICE_ONLINE:                   // 网络设备上线
                     address = intent.getStringExtra(MqttIntentService.EXTRA_TOPIC);
+                    index = getDeviceIndex(address);
+                    if(index == -1) return;
+                    device = devices.get(index);
                     break;
                 case MqttIntentService.ACTION_RECEIVER:                                // 网络数据接收
+                    address = intent.getStringExtra(MqttIntentService.EXTRA_TOPIC);
+                    index = getDeviceIndex(address);
+                    if(index == -1) return;
+                    device = devices.get(index);
+                    // 获取数据
                     data = intent.getStringExtra(MqttIntentService.EXTRA_DATA);
+                    if (data == null) return;
+                    // 温湿度和状态更新
                     if(data.contains("=")){
                         String[] kv = data.split("=");
                         switch (kv[0]){
                             case "temp": // 温度
+                                device.setState(String.format("温度%s℃", kv[1]));
                                 temperatureData.setValue(kv[1]);
                                 break;
                             case "humi": // 湿度
+                                device.setState(device.getState() + String.format(" 湿度%s％", kv[1]));
                                 humidityData.setValue(kv[1]);
+                                break;
+                            case "state":
+                                device.setState(kv[1]);
                                 break;
                             default:
                         }
                     }
-
                     break;
                 case BleIntentService.ACTION_DATA_AVAILABLE:                        // 蓝牙数据接收
                     break;
                 default:
             }
-            int index = getDeviceIndex(address);
-            if(index == -1) return;
-            Device device = devices.get(index);
-            deviceData.setValue(device);
+
+            if (device != null) {
+                deviceData.setValue(device);
+            }
         }
     };
 

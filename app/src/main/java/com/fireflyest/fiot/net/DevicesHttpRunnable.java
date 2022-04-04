@@ -52,9 +52,10 @@ public class DevicesHttpRunnable implements Runnable{
             Type type = new TypeToken<ArrayList<Device>>(){}.getType();
             List<Device> deviceList = new Gson().fromJson(body.string(), type);
             for (Device device : deviceList) {
+                Thread.sleep(500);
                 data.postValue(device);
             }
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }

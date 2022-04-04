@@ -73,7 +73,8 @@ public class LoginActivity extends BaseActivity {
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
 
-        binding.loginSwitch.setTextArray("登录", "注册");
+        String[] buttons = {"登录", "注册"};
+        binding.loginSwitch.setTextArray(buttons);
         binding.loginSwitch.setChangeListener(select ->{
             if(select == 0){
                 binding.loginMotion.transitionToStart();

@@ -28,6 +28,8 @@ public class Device implements Parcelable {
     // 类型
     private int type;
 
+    private String state;
+
     public Device(long id, String name, long owner, long home, String address, String room, int type) {
         this.id = id;
         this.name = name;
@@ -44,6 +46,7 @@ public class Device implements Parcelable {
         this.nickname = btDevice.getName();
         this.address = btDevice.getAddress();
         this.type = DeviceType.NON;
+        this.state = btDevice.getAddress();
     }
 
     public Device() {
@@ -113,6 +116,14 @@ public class Device implements Parcelable {
         this.type = type;
     }
 
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
     @Override
     public String toString() {
         return "Device{" +
@@ -124,6 +135,7 @@ public class Device implements Parcelable {
                 ", address='" + address + '\'' +
                 ", room='" + room + '\'' +
                 ", type=" + type +
+                ", state=" + state +
                 '}';
     }
 
@@ -142,6 +154,7 @@ public class Device implements Parcelable {
         dest.writeString(address);
         dest.writeString(room);
         dest.writeInt(type);
+        dest.writeString(state);
     }
 
     protected Device(Parcel in){
@@ -153,6 +166,7 @@ public class Device implements Parcelable {
         address = in.readString();
         room = in.readString();
         type = in.readInt();
+        state = in.readString();
     }
 
     public static final Creator<Device> CREATOR = new Creator<Device>() {

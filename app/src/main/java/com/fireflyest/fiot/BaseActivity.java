@@ -17,7 +17,7 @@ import java.util.List;
 
 public class BaseActivity extends AppCompatActivity {
 
-    public static final String DEBUG_URL = "192.168.212.213";
+    public static final String DEBUG_URL = "192.168.182.213";
 
     public static final String EXTRA_DEVICE = // 设备
             "com.fireflyest.fiot.activity.extra.DEVICE";
