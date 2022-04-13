@@ -22,7 +22,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:title=" "
-            android:background="?attr/colorOnSurface"
             android:fitsSystemWindows="true"
             app:titleTextAppearance="@style/text_title"
             app:layout_constraintTop_toTopOf="parent"

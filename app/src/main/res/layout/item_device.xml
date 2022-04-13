@@ -59,6 +59,7 @@
             android:theme="@style/text_small"
             android:text="@={device.state}"/>
 
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

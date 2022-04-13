@@ -60,4 +60,23 @@
     <string name="remove">删除</string>
     <string name="done">确定</string>
     <string name="cancel">取消</string>
+    <string name="temp">温度</string>
+    <string name="humi">湿度</string>
+    <string name="light">灯光</string>
+    <string name="variety">变化趋势图</string>
+    <string name="environment">温湿度控制</string>
+    <string name="default_temp">22</string>
+    <string name="up">升高</string>
+    <string name="down">降低</string>
+    <string name="on">开启</string>
+    <string name="off">关闭</string>
+    <string name="eco_on">ECO</string>
+    <string name="normal">NORMAL</string>
+    <string name="ud_wind">上下风</string>
+    <string name="rl_wind">左右风</string>
+    <string name="mode">模式</string>
+    <string name="speed_wind">风速</string>
+    <string name="cold">制冷</string>
+    <string name="luminance">亮度</string>
+    <string name="color">颜色</string>
 </resources>

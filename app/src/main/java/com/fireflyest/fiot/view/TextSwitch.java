@@ -152,18 +152,7 @@ public class TextSwitch extends View {
         float start = joinWidth+1, end = joinWidth-1;
         if(selectWidth == 0) selectWidth = (width-2*(joinWidth+1))/strings.length;
 
-        Paint.FontMetrics fontMetrics = textPaint.getFontMetrics();
-        float distance=(fontMetrics.bottom - fontMetrics.top)/2 - fontMetrics.bottom;
 
-        float i = 0;
-        for(String s : strings){
-            if(select == i){
-                canvas.drawText(s, joinWidth+1+selectWidth*(i+0.5F)+dragX, height/2+distance, selectTextPaint);
-            }else {
-                canvas.drawText(s, joinWidth+1+selectWidth*(i+0.5F)+dragX, height/2+distance, textPaint);
-            }
-            i++;
-        }
 
         if(state == EMPTY) {
             left = start+select*selectWidth;
@@ -176,6 +165,7 @@ public class TextSwitch extends View {
             state = IDLE;
         }
 
+        // 背景
         if(barWidth == 0){
             canvas.drawRoundRect(
                     left+dragX,
@@ -196,6 +186,18 @@ public class TextSwitch extends View {
                     joinWidth,
                     barPaint
             );
+        }
+        // 字
+        Paint.FontMetrics fontMetrics = textPaint.getFontMetrics();
+        float distance=(fontMetrics.bottom - fontMetrics.top)/2 - fontMetrics.bottom;
+        float i = 0;
+        for(String s : strings){
+            if(select == i){
+                canvas.drawText(s, joinWidth+1+selectWidth*(i+0.5F)+dragX, height/2+distance, selectTextPaint);
+            }else {
+                canvas.drawText(s, joinWidth+1+selectWidth*(i+0.5F)+dragX, height/2+distance, textPaint);
+            }
+            i++;
         }
 
     }

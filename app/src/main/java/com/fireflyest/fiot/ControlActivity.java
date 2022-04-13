@@ -22,6 +22,7 @@ import com.fireflyest.fiot.model.ControlViewModel;
 import com.fireflyest.fiot.net.DeviceTypeHttpRunnable;
 import com.fireflyest.fiot.service.BleIntentService;
 import com.fireflyest.fiot.service.MqttIntentService;
+import com.fireflyest.fiot.ui.ControlFragment;
 import com.fireflyest.fiot.ui.ControlInitialFragment;
 import com.fireflyest.fiot.ui.ControlNormalFragment;
 import com.fireflyest.fiot.util.StatusBarUtil;
@@ -86,6 +87,7 @@ public class ControlActivity extends BaseActivity {
 
             // 首次连接设备
             if (device.getType() == DeviceType.NON){
+                // 判断是否收录
                 if(DEVICE_TYPE_MAP.containsKey(device.getName()) &&
                         home.getWifi() != null &&
                         home.getPassword() != null){                // 收录设备初始化
@@ -95,8 +97,13 @@ public class ControlActivity extends BaseActivity {
                     device.setType(type);
                     // mqtt订阅
                     MqttIntentService.subscribe(this, device.getAddress());
-                }else {                                                                               // 非收录设备本地蓝牙发送
+                }else {
+                    // 非收录设备本地蓝牙发送
                     device.setType(DeviceType.LOCAL);
+
+                    // TODO: 2022/4/13 测试 以后删掉这行
+                    device.setType(DeviceType.REMOTE | DeviceType.ILLUMINATION_COLOR | DeviceType.ILLUMINATION);
+
                 }
                 // 更新页面
                 model.getDeviceData().setValue(device);
@@ -109,10 +116,14 @@ public class ControlActivity extends BaseActivity {
             if(device.getType() == DeviceType.NON){
                 // 初始化界面
                 fragment = new ControlInitialFragment();
-            }else{
+            } else if(device.getType() == DeviceType.LOCAL){
                 // 默认蓝牙传输
                 Log.d(TAG, "打开蓝牙传输界面");
                 fragment = new ControlNormalFragment();
+            } else{
+                // 默认蓝牙传输
+                Log.d(TAG, "打开控制界面");
+                fragment = new ControlFragment();
             }
             // 打开页面
             this.getSupportFragmentManager()

@@ -28,7 +28,6 @@ import com.fireflyest.fiot.HomeActivity;
 import com.fireflyest.fiot.MainActivity;
 import com.fireflyest.fiot.R;
 import com.fireflyest.fiot.adapter.DeviceItemAdapter;
-import com.fireflyest.fiot.anim.DeviceItemAnimator;
 import com.fireflyest.fiot.bean.Account;
 import com.fireflyest.fiot.bean.Device;
 import com.fireflyest.fiot.bean.Home;
@@ -147,7 +146,7 @@ public class DeviceFragment extends Fragment {
             manager.setOnClickListener(vm -> {
                 Intent intent = new Intent(getContext(), HomeActivity.class);
                 intent.putExtra(BaseActivity.EXTRA_HOME, model.getHomeData().getValue());
-                getActivity().startActivityForResult(intent, MainActivity.REQUEST_HOME);
+                activity.startActivityForResult(intent, MainActivity.REQUEST_HOME);
                 popupWindow.dismiss();
             });
 
@@ -220,7 +219,7 @@ public class DeviceFragment extends Fragment {
             // 如果蓝牙已连接或是网络设备，打开
             if(MainViewModel.getConnectState(device.getAddress()) != 0){
                 // 已连接控制打开界面
-                Intent intent = new Intent(this.getActivity(), ControlActivity.class);
+                Intent intent = new Intent(activity, ControlActivity.class);
                 intent.putExtra(BaseActivity.EXTRA_DEVICE, device);
                 intent.putExtra(BaseActivity.EXTRA_HOME, model.getHomeData().getValue());
                 ActivityOptions options = ActivityOptions
@@ -249,7 +248,7 @@ public class DeviceFragment extends Fragment {
             open.setOnClickListener(v -> {
                 popupWindow.dismiss();
 
-                Intent intent = new Intent(this.getActivity(), ControlActivity.class);
+                Intent intent = new Intent(activity, ControlActivity.class);
                 intent.putExtra(BaseActivity.EXTRA_DEVICE, device);
                 intent.putExtra(BaseActivity.EXTRA_HOME, model.getHomeData().getValue());
                 ActivityOptions options = ActivityOptions
@@ -261,7 +260,7 @@ public class DeviceFragment extends Fragment {
             move.setOnClickListener(v ->{
                 popupWindow.dismiss();
                 // 弹窗
-                AlertDialog moveDialog = new AlertDialog.Builder(getActivity())
+                AlertDialog moveDialog = new AlertDialog.Builder(activity)
                         .setMessage("输入房间的名称")
                         .setTitle(R.string.move)
                         .setView(R.layout.diaog_edittext)
@@ -285,7 +284,7 @@ public class DeviceFragment extends Fragment {
             nickname.setOnClickListener(v->{
                 popupWindow.dismiss();
                 // 弹窗
-                AlertDialog nicknameDialog = new AlertDialog.Builder(getActivity())
+                AlertDialog nicknameDialog = new AlertDialog.Builder(activity)
                         .setMessage("输入备注")
                         .setTitle(R.string.nickname)
                         .setView(R.layout.diaog_edittext)
