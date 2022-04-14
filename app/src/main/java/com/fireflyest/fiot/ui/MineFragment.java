@@ -122,12 +122,11 @@ public class MineFragment extends Fragment {
             binding.setAccount(account);
             // 初始化家列表
             new Thread(new HomesHttpRunnable(account.getId(), model.getHomesData())).start();
-            // 更新设备列表
-//            new Thread(new DevicesHttpRunnable(account.getId(), model.getDeviceData())).start();
+            // 初始化场景列表
         });
 
         // 初始化账户
-        binding.setDeviceInfo("0个智能设备");
+        model.getDeviceNumData().observe(getViewLifecycleOwner(), num-> binding.setDeviceInfo(String.format("%s个智能设备", num)));
 
         // 自动登录
         long account = PreferencesUtils.getLongData("login_account");

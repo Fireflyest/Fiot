@@ -17,12 +17,15 @@ import java.util.List;
 
 public class BaseActivity extends AppCompatActivity {
 
-    public static final String DEBUG_URL = "192.168.135.213";
+    public static final String DEBUG_URL = "192.168.199.213";
+
+    public static final String EXTRA_NAME = // 名称
+            "com.fireflyest.fiot.activity.extra.NAME";
 
     public static final String EXTRA_DEVICE = // 设备
             "com.fireflyest.fiot.activity.extra.DEVICE";
 
-    public static final String EXTRA_HOME = // 设备
+    public static final String EXTRA_HOME = // 家
             "com.fireflyest.fiot.activity.extra.HOME";
 
     private final List<BroadcastReceiver>  receivers = new ArrayList<>();

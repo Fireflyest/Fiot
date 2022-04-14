@@ -21,7 +21,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Fiot"
         android:usesCleartextTraffic="true">
-
+        <activity android:name=".CommandActivity"></activity>
         <activity android:name=".LaunchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -47,7 +47,6 @@
         <service
             android:name=".service.BleIntentService"
             android:exported="false" />
-
         <service
             android:name=".service.MqttIntentService"
             android:exported="false" />

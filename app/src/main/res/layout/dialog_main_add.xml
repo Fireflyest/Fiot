@@ -19,6 +19,7 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/dialog_add_background"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 

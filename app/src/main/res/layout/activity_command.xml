@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".CommandActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/command_toolbar"
+            android:fitsSystemWindows="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:navigationIcon="@drawable/ic_back"
+            app:layout_collapseMode="none" />
+
+        <TextView
+            android:id="@+id/command_control_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:theme="@style/text_tip"
+            app:layout_constraintTop_toBottomOf="@+id/command_toolbar"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="22dp"
+            android:text="@string/device_control"/>
+
+        <Spinner
+            android:id="@+id/command_device_spinner"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/command_spinner"
+            app:layout_constraintTop_toBottomOf="@+id/command_control_text"
+            android:layout_marginTop="12dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/round_background"
+            android:textSize="17sp"
+            android:textColor="@color/gray_light"
+            android:gravity="center"
+            app:drawableEndCompat="@drawable/ic_forward_small" />
+
+        <Spinner
+            android:id="@+id/command_spinner"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/command_device_spinner"
+            app:layout_constraintStart_toEndOf="@+id/command_device_spinner"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/round_background"
+            android:textSize="17sp"
+            android:textColor="@color/gray_light"
+            android:gravity="center"
+            app:drawableEndCompat="@drawable/ic_forward_small" />
+
+        <TextView
+            android:id="@+id/command_data_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:theme="@style/text_tip"
+            app:layout_constraintTop_toBottomOf="@+id/command_device_spinner"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="22dp"
+            android:text="@string/command"/>
+
+        <EditText
+            android:id="@+id/command_data_edit"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:background="@drawable/round_background"
+            app:layout_constraintTop_toBottomOf="@+id/command_data_text"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="12dp"
+            android:padding="12dp"
+            android:gravity="start"
+            android:autofillHints=""
+            android:hint="@string/hint_command"
+            android:inputType="textMultiLine"
+            tools:ignore="LabelFor" />
+
+        <ImageView
+            android:id="@+id/command_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:elevation="10dp"
+            android:src="@drawable/ic_done"
+            android:layout_marginEnd="32dp"
+            android:background="@drawable/background_float"
+            android:layout_gravity="center"
+            app:layout_constraintTop_toBottomOf="@+id/command_data_edit"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:contentDescription="@string/done" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

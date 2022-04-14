@@ -36,6 +36,7 @@ public class MainViewModel extends ViewModel {
     // 更新的设备
     private final MutableLiveData<BtDevice> btDeviceData = new MutableLiveData<>();
     private final MutableLiveData<Device> deviceData = new MutableLiveData<>();
+    private final MutableLiveData<Integer> deviceNumData = new MutableLiveData<>();
 
     // 账户
     private final MutableLiveData<Account> accountData = new MutableLiveData<>();
@@ -143,6 +144,10 @@ public class MainViewModel extends ViewModel {
         return deviceData;
     }
 
+    public MutableLiveData<Integer> getDeviceNumData() {
+        return deviceNumData;
+    }
+
     public MutableLiveData<Account> getAccountData() {
         return accountData;
     }
@@ -179,6 +184,8 @@ public class MainViewModel extends ViewModel {
         Account a = new Account();
         a.setName("点击头像登录");
         accountData.setValue(a);
+
+        deviceNumData.setValue(0);
     }
 
 

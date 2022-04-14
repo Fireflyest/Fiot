@@ -79,4 +79,9 @@
     <string name="cold">制冷</string>
     <string name="luminance">亮度</string>
     <string name="color">颜色</string>
+    <string name="command_name">指令名称</string>
+    <string name="device_select">选择设备</string>
+    <string name="device_control">设备操作</string>
+    <string name="hint_command">该指令发送的数据...</string>
+    <string name="add_command">添 加 指 令</string>
 </resources>

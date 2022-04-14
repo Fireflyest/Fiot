@@ -202,8 +202,11 @@ public class DeviceFragment extends Fragment {
                 deviceItemAdapter.updateItem(index);
             }else {
                 deviceItemAdapter.addItem(device);
+                // 更新设备数量
+                int num = model.getDeviceNumData().getValue() + 1;
+                model.getDeviceNumData().setValue(num);
                 // mqtt订阅
-                MqttIntentService.subscribe(getContext(), device.getAddress());
+                MqttIntentService.subscribe(getContext(),  device.getAddress());
             }
             // 房间
             // TODO: 2022/4/4

@@ -21,6 +21,7 @@ import com.fireflyest.fiot.bean.Home;
 import com.fireflyest.fiot.databinding.ActivityMainBinding;
 import com.fireflyest.fiot.dialog.VagueDialog;
 import com.fireflyest.fiot.model.MainViewModel;
+import com.fireflyest.fiot.net.SentenceCreateHttpRunnable;
 import com.fireflyest.fiot.service.BleIntentService;
 import com.fireflyest.fiot.service.MqttIntentService;
 import com.fireflyest.fiot.ui.DeviceFragment;
@@ -34,8 +35,9 @@ import java.util.List;
 public class MainActivity extends BaseActivity {
 
     public static final int REQUEST_BLUETOOTH = 1;
-    public static final int REQUEST_HOME = 2;
-    public static final int REQUEST_CONTROL = 3;
+    public static final int REQUEST_SENTENCE = 2;
+    public static final int REQUEST_HOME = 3;
+    public static final int REQUEST_CONTROL = 4;
 
     public static final String TAG = MainActivity.class.getSimpleName();
 
@@ -142,17 +144,22 @@ public class MainActivity extends BaseActivity {
         });
 
         // 中间按钮
-        binding.mainFloat.setOnClickListener(v ->
-                new VagueDialog(MainActivity.this, R.layout.dialog_main_add)
-                        .setOnItemClickListener(id -> {
-                            if(id == R.id.device_add){
-                                Intent intent = new Intent(this, ScanActivity.class);
-                                this.startActivityForResult(intent, REQUEST_BLUETOOTH, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
-                            }else if(id == R.id.command_add){
-
-                            }
-                        })
-                        .show());
+        binding.mainFloat.setOnClickListener(v ->{
+            VagueDialog dialog = new VagueDialog(MainActivity.this, R.layout.dialog_main_add);
+            dialog.setOnItemClickListener(id -> {
+                if(id == R.id.device_add){
+                    Intent intent = new Intent(this, ScanActivity.class);
+                    this.startActivityForResult(intent, REQUEST_BLUETOOTH, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+                }else if(id == R.id.command_add){
+                    Intent intent = new Intent(this, CommandActivity.class);
+                    intent.putExtra(BaseActivity.EXTRA_HOME, model.getHomeData().getValue());
+                    this.startActivityForResult(intent, REQUEST_SENTENCE, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+                }else if(id == R.id.dialog_add_background){
+                    dialog.dismiss();
+                }
+            });
+            dialog.show();
+        });
     }
 
     @Override
@@ -183,6 +190,17 @@ public class MainActivity extends BaseActivity {
                 if (resultCode != Activity.RESULT_OK) return;
                 Device device = data.getParcelableExtra(BaseActivity.EXTRA_DEVICE);
                 model.getDeviceData().setValue(device);
+                break;
+            case REQUEST_SENTENCE:
+                if (resultCode != Activity.RESULT_OK) return;
+                String sentenceName = data.getStringExtra(BaseActivity.EXTRA_NAME);
+                Device controlDevice = data.getParcelableExtra(BaseActivity.EXTRA_DEVICE);
+                String sentenceData = data.getStringExtra(MqttIntentService.EXTRA_DATA);
+                if (controlDevice == null) {
+                    break;
+                }
+                new Thread(
+                        new SentenceCreateHttpRunnable(controlDevice.getHome(), sentenceName, controlDevice.getAddress(), sentenceData)).start();
                 break;
             default:
         }

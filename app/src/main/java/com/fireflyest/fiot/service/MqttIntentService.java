@@ -108,7 +108,7 @@ public class MqttIntentService extends IntentService {
     /**
      * 这里的topic实为设备的蓝牙地址
      * @param context 上下文
-     * @param topic 主题
+     * @param topic 主题 二级topic
      * @param data 数据
      */
     public static void send(Context context, String topic, String data) {
@@ -119,6 +119,11 @@ public class MqttIntentService extends IntentService {
         context.startService(intent);
     }
 
+    /**
+     * 订阅
+     * @param context 上下文
+     * @param topic 二级topic
+     */
     public static void subscribe(Context context, String topic) {
         Intent intent = new Intent(context, MqttIntentService.class);
         intent.setAction(ACTION_SUBSCRIBE);
@@ -126,6 +131,11 @@ public class MqttIntentService extends IntentService {
         context.startService(intent);
     }
 
+    /**
+     * 取消订阅
+     * @param context 上下文
+     * @param topic 二级topic
+     */
     public static void unsubscribe(Context context, String topic) {
         Intent intent = new Intent(context, MqttIntentService.class);
         intent.setAction(ACTION_UNSUBSCRIBE);
