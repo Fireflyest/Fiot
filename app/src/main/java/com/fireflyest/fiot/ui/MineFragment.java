@@ -19,8 +19,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.fireflyest.fiot.BaseActivity;
 import com.fireflyest.fiot.LoginActivity;
 import com.fireflyest.fiot.R;
+import com.fireflyest.fiot.SceneActivity;
 import com.fireflyest.fiot.adapter.LineItemAdapter;
 import com.fireflyest.fiot.bean.Account;
 import com.fireflyest.fiot.bean.Line;
@@ -41,6 +43,7 @@ public class MineFragment extends Fragment {
 
     private static final String TAG = "MineFragment";
     private static final int RESULT_LOGIN = 0;
+    private static final int RESULT_SCENE = 0;
 
     int tryAmount = 0;
 
@@ -123,10 +126,18 @@ public class MineFragment extends Fragment {
             // 初始化家列表
             new Thread(new HomesHttpRunnable(account.getId(), model.getHomesData())).start();
             // 初始化场景列表
+
         });
 
         // 初始化账户
         model.getDeviceNumData().observe(getViewLifecycleOwner(), num-> binding.setDeviceInfo(String.format("%s个智能设备", num)));
+        model.getSceneNumData().observe(getViewLifecycleOwner(), num-> binding.setSceneInfo(String.format("%s个场景", num)));
+
+        binding.mineScene.setOnClickListener(v ->{
+            Intent intent = new Intent(activity, SceneActivity.class);
+            intent.putExtra(BaseActivity.EXTRA_HOME, model.getHomeData().getValue());
+            startActivityForResult(intent, RESULT_SCENE);
+        });
 
         // 自动登录
         long account = PreferencesUtils.getLongData("login_account");

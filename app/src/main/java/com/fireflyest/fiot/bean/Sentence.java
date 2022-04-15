@@ -12,6 +12,8 @@ public class Sentence {
 
     private String data;
 
+    private boolean select;
+
     public Sentence() {
     }
 
@@ -53,5 +55,13 @@ public class Sentence {
 
     public void setData(String data) {
         this.data = data;
+    }
+
+    public boolean isSelect() {
+        return select;
+    }
+
+    public void setSelect(boolean select) {
+        this.select = select;
     }
 }

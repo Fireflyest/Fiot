@@ -3,12 +3,36 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
+        <variable
+            name="sentence"
+            type="com.fireflyest.fiot.bean.Sentence" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:padding="4dp"
+        android:background="@drawable/round_background">
+
+        <CheckBox
+            android:id="@+id/sentence_check"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="@{sentence.select}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <TextView
+            android:id="@+id/sentence_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:theme="@style/text_bold"
+            android:text="@{sentence.name}"
+            app:layout_constraintStart_toEndOf="@+id/sentence_check"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

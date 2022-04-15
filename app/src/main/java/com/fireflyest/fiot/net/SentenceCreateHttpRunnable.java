@@ -1,18 +1,12 @@
 package com.fireflyest.fiot.net;
 
-import androidx.lifecycle.MutableLiveData;
-
 import com.fireflyest.fiot.BaseActivity;
-import com.fireflyest.fiot.bean.Device;
-import com.google.gson.Gson;
 
 import java.io.IOException;
 
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
 
 public class SentenceCreateHttpRunnable implements Runnable{
 
@@ -39,7 +33,6 @@ public class SentenceCreateHttpRunnable implements Runnable{
                 .addQueryParameter("name", name)
                 .addQueryParameter("target", target)
                 .addQueryParameter("data", data)
-                .addQueryParameter("home", String.valueOf(home))
                 .build();
         Request request = new Request.Builder()
                 .url(url)

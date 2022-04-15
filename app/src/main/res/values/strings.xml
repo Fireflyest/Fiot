@@ -84,4 +84,10 @@
     <string name="device_control">设备操作</string>
     <string name="hint_command">该指令发送的数据...</string>
     <string name="add_command">添 加 指 令</string>
+    <string name="new_scene">添加场景</string>
+    <string name="scene_sleep">场景睡觉</string>
+    <string name="next">下一个</string>
+    <string name="scene_name">场景名称</string>
+    <string name="sentence_list">指令列表</string>
+    <string name="scene_condition">触发条件</string>
 </resources>

@@ -199,8 +199,13 @@ public class MainActivity extends BaseActivity {
                 if (controlDevice == null) {
                     break;
                 }
-                new Thread(
-                        new SentenceCreateHttpRunnable(controlDevice.getHome(), sentenceName, controlDevice.getAddress(), sentenceData)).start();
+                Home selectHome = model.getHomeData().getValue();
+                if (selectHome != null) {
+                    Log.d(TAG, String.format("home=%s name = %s", selectHome.getId(), sentenceName));
+                    new Thread(
+                            new SentenceCreateHttpRunnable(selectHome.getId(), sentenceName, controlDevice.getAddress(), sentenceData)).start();
+                    ToastUtil.showShort(this, "添加成功");
+                }
                 break;
             default:
         }

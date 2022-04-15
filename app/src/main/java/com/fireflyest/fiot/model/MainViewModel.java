@@ -38,6 +38,9 @@ public class MainViewModel extends ViewModel {
     private final MutableLiveData<Device> deviceData = new MutableLiveData<>();
     private final MutableLiveData<Integer> deviceNumData = new MutableLiveData<>();
 
+    // 场景
+    private final MutableLiveData<Integer> sceneNumData = new MutableLiveData<>();
+
     // 账户
     private final MutableLiveData<Account> accountData = new MutableLiveData<>();
 
@@ -148,6 +151,10 @@ public class MainViewModel extends ViewModel {
         return deviceNumData;
     }
 
+    public MutableLiveData<Integer> getSceneNumData() {
+        return sceneNumData;
+    }
+
     public MutableLiveData<Account> getAccountData() {
         return accountData;
     }
@@ -186,6 +193,7 @@ public class MainViewModel extends ViewModel {
         accountData.setValue(a);
 
         deviceNumData.setValue(0);
+        sceneNumData.setValue(0);
     }
 
 

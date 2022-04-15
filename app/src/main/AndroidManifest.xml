@@ -21,7 +21,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Fiot"
         android:usesCleartextTraffic="true">
-        <activity android:name=".CommandActivity"></activity>
+        <activity android:name=".SceneActivity"
+            android:windowSoftInputMode="adjustNothing"/>
+        <activity android:name=".CommandActivity" />
         <activity android:name=".LaunchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
